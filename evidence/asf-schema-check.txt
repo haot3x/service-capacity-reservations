@@ -1,0 +1,2 @@
+specification.json passes pinned upstream safety-specification.schema.json
+profile.json passes pinned upstream profile-descriptor.schema.json

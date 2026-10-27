@@ -1,0 +1,122 @@
+{
+  "asf": "1.0",
+  "kind": "safety-specification",
+  "name": "Service Capacity Safety",
+  "version": 1,
+  "summary": "Local integration policy for one pool and its sole guarded market.",
+  "protects": [
+    {
+      "domain": "assets-economic",
+      "roles": [
+        "principal",
+        "counterparty"
+      ],
+      "description": "Avoid new capacity commitments under a stopped provider binding while preserving established escrow rights."
+    }
+  ],
+  "applicability": {
+    "subjects": [
+      "immutable provider of one capacity pool"
+    ],
+    "tasks": [
+      "reserve report admissions",
+      "fund reserved orders",
+      "admit work",
+      "submit already-admitted results"
+    ],
+    "resources": [
+      "one pool on one chain with one guarded market"
+    ],
+    "environments": [
+      "local EVM prototype"
+    ],
+    "notes": "Existing escrow cancellation, expiry, refunds, acceptance and rejection are outside the provider binding and follow the separate booking terms."
+  },
+  "constraints": [
+    {
+      "id": "capacity-safety",
+      "profile": "x:finch:capacity-safety@1",
+      "family": "governance-accountability",
+      "statement": "Active bindings permit covered operations. Suspensions stop new commitments. Only sets 4 or 5 allow already-admitted result submission; all other failed checks close covered paths.",
+      "parameters": {
+        "continuation": "submit-only",
+        "newExposure": [
+          "hold",
+          "confirm",
+          "admit"
+        ],
+        "settlement": "independent-order-authority",
+        "version": 1
+      },
+      "scope": "group",
+      "enforcedBy": [
+        "market-gate"
+      ]
+    }
+  ],
+  "authority": {
+    "whoMayAdopt": [
+      "immutable pool provider"
+    ],
+    "whoMayEnforce": [
+      "guarded market",
+      "fixed guardian named by the market requirement"
+    ],
+    "authorityBasis": [
+      "pool creation transaction and immutable provider/adapter records; buyer confirmation of immutable booking terms",
+      "Every ancestor must preserve the same provider, pool authority, fixed parameters and fixed guardian; no other account may hold its resume right."
+    ]
+  },
+  "evidence": [],
+  "enforcement": {
+    "channels": [
+      {
+        "id": "market-gate",
+        "description": "Every hold, confirmation, admission and result submission checks the fixed current binding. Confirmation checks again after the token transfer.",
+        "mechanism": {
+          "kind": "contract",
+          "ref": "ASFCapacityMarket deployment"
+        },
+        "location": "contract",
+        "coverage": "full",
+        "knownBypasses": [
+          "Other pools and off-chain actions are outside this binding. Separate escrow recovery/settlement rights are explicitly outside its scope."
+        ]
+      }
+    ]
+  },
+  "failureHandling": {
+    "unknown": "refuse",
+    "denied": "refuse",
+    "dependencyFailure": "refuse",
+    "notes": "No covered operation passes on an unknown or malformed registry response. Existing escrow rights remain enforceable independently. A nonzero responseRef on any suspended record closes delivery continuation until a supported response-document verifier exists."
+  },
+  "remedies": {
+    "suspensionModes": [
+      "no-new-risk",
+      "shrink",
+      "essential-only",
+      "derisk-only",
+      "full-stop"
+    ],
+    "recovery": "The named guardian may resume; the pool cannot replace its pinned binding.",
+    "serviceContinuity": [
+      "Submit an already-admitted report only under ESSENTIAL_ONLY or ESSENTIAL_ONLY plus NO_NEW_RISK."
+    ],
+    "compensation": "Original immutable order refunds and settlement only; no new compensation right."
+  },
+  "profiles": {
+    "required": [
+      "x:finch:capacity-safety@1"
+    ],
+    "optional": []
+  },
+  "limitations": [
+    "No proof of capacity outside this pool, actual computation, or report quality.",
+    "Refund and settlement rights have a separate pre-existing authority and are not frozen by this provider binding."
+  ],
+  "metadata": {
+    "author": "Ted (@haot3x)",
+    "experimental": true
+  }
+}

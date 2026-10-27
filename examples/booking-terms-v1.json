@@ -1,0 +1,12 @@
+{
+  "schema": "finch.booking-terms.example.v1",
+  "author": "Ted (@haot3x)",
+  "payment": "Buyer funds units times the market's immutable unitPrice in its configured exact-transfer test token.",
+  "cancellation": "Full refund before the admission window starts; a direct ledger release remains recoverable through claimRefund.",
+  "unusedExpiry": "A confirmed booking unused at windowEnd receives a full refund, including after third-party cleanup.",
+  "acceptance": "The buyer is the sole evaluator. After provider submission, buyer acceptance before settlementDeadline pays the provider; rejection refunds the buyer.",
+  "timeout": "Any admitted or submitted order that remains unpaid at settlementDeadline is refundable to the original buyer by any caller.",
+  "capacity": "Consumed admission quota is never restored by completion, rejection, or refund.",
+  "restrictions": "No partial consumption, resale, cancellation fees, amendments, cross-chain settlement, arbitration, or automatic off-chain execution.",
+  "commitment": "termsHash is keccak256 of the exact UTF-8 bytes of this file, including its final newline."
+}

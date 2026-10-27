@@ -1,0 +1,22 @@
+{
+  "schema": "finch.service-definition.example.v1",
+  "name": "Bounded public-source research report",
+  "unit": "One authorized report-job admission during the pool window",
+  "input": {
+    "language": "English",
+    "questionMaxCharacters": 2000,
+    "sourceCountMax": 5,
+    "providedSourceTextMaxCharacters": 12000,
+    "sourcePolicy": "Buyer supplies public-source text and its original URLs; no authenticated browsing or purchases."
+  },
+  "output": {
+    "format": "Markdown",
+    "minimumWords": 800,
+    "maximumWords": 1200,
+    "requiredSections": ["Findings", "Evidence", "Uncertainties"],
+    "citationPolicy": "Link factual claims to supplied sources; distinguish inference from source statements."
+  },
+  "validation": "Input eligibility and output acceptance are off-chain buyer/provider policy. The prototype does not validate documents, run an agent, or attest quality.",
+  "delivery": "Admission occurs in the pool window. The market's settlementDeadline is separate from the admission window.",
+  "commitment": "serviceHash is keccak256 of the exact UTF-8 bytes of this file, including its final newline."
+}

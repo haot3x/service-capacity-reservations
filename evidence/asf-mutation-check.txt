@@ -1,0 +1,43 @@
+MUTATION REJECTED: post-transfer safety recheck
+Test: test_ASFPaymentCallbackSuspensionRollsBackEntireConfirmation
+Exit status: 1
+Compiling 6 files with Solc 0.8.26
+Solc 0.8.26 finished in 1.30s
+Compiler run successful!
+
+Ran 1 test for test/ASFCapacity.t.sol:ASFCapacityTest
+[FAIL: next call did not revert as expected] test_ASFPaymentCallbackSuspensionRollsBackEntireConfirmation() (gas: 5897382)
+Suite result: FAILED. 0 passed; 1 failed; 0 skipped; finished in 3.43ms (1.36ms CPU time)
+
+Ran 1 test suite in 4.64ms (3.43ms CPU time): 0 tests passed, 1 failed, 0 skipped (1 total tests)
+
+Failing tests:
+Encountered 1 failing test in test/ASFCapacity.t.sol:ASFCapacityTest
+[FAIL: next call did not revert as expected] test_ASFPaymentCallbackSuspensionRollsBackEntireConfirmation() (gas: 5897382)
+
+Encountered a total of 1 failing tests, 0 tests succeeded
+
+Tip: Run `forge test --rerun` to retry only the 1 failed test
+
+
+MUTATION REJECTED: ancestor resume-holder closure
+Test: test_ASFAncestorWithExtraResumeKeyIsRejectedEvenIfLeafLooksValid
+Exit status: 1
+Compiling 6 files with Solc 0.8.26
+Solc 0.8.26 finished in 1.31s
+Compiler run successful!
+
+Ran 1 test for test/ASFCapacity.t.sol:ASFCapacityTest
+[FAIL: next call did not revert as expected] test_ASFAncestorWithExtraResumeKeyIsRejectedEvenIfLeafLooksValid() (gas: 1593471)
+Suite result: FAILED. 0 passed; 1 failed; 0 skipped; finished in 2.20ms (761.96µs CPU time)
+
+Ran 1 test suite in 3.96ms (2.20ms CPU time): 0 tests passed, 1 failed, 0 skipped (1 total tests)
+
+Failing tests:
+Encountered 1 failing test in test/ASFCapacity.t.sol:ASFCapacityTest
+[FAIL: next call did not revert as expected] test_ASFAncestorWithExtraResumeKeyIsRejectedEvenIfLeafLooksValid() (gas: 1593471)
+
+Encountered a total of 1 failing tests, 0 tests succeeded
+
+Tip: Run `forge test --rerun` to retry only the 1 failed test
+

@@ -1,0 +1,61 @@
+{
+  "asf": "1.0",
+  "kind": "profile-descriptor",
+  "identifier": "x:finch:capacity-safety@1",
+  "family": "governance-accountability",
+  "summary": "Gate capacity commitments and provider delivery while preserving independent escrow recovery and settlement rights.",
+  "evaluatesOver": [
+    "action",
+    "state",
+    "group"
+  ],
+  "parameterSchema": {
+    "const": {
+      "continuation": "submit-only",
+      "newExposure": [
+        "hold",
+        "confirm",
+        "admit"
+      ],
+      "settlement": "independent-order-authority",
+      "version": 1
+    }
+  },
+  "partialOrder": {
+    "defined": true,
+    "rule": "Narrowing is accepted only for identical parameter documents, compared by paramsHash. Every ancestor must also preserve the same provider, pool scope and authority reference. The consumer pins the admitted leaf binding ID."
+  },
+  "verification": [
+    {
+      "method": "on-chain-guard",
+      "location": "contract",
+      "inputs": [
+        "immutable pool provider and adapter set",
+        "pinned ASF binding and ancestor records",
+        "current ASF clause result"
+      ],
+      "resultMeaning": "The guarded marketplace enforced the local action policy in this transaction.",
+      "trustAssumptions": [
+        "pinned ASF reference registries",
+        "exact-transfer payment asset",
+        "fixed named guardian"
+      ]
+    }
+  ],
+  "requirements": [
+    "Only a pool whose sole adapter is this guarded market may be configured.",
+    "Held plus confirmed plus consumed units never exceeds pool capacity. Consumed quota never reopens after payment refund.",
+    "An admission is an on-chain authorization, not proof of an off-chain effect. Off-chain reconciliation and dispatch deduplication remain application obligations.",
+    "Unknown, expiry, termination, invalid authority and unsupported profile results never authorize covered operations.",
+    "Only an ESSENTIAL_ONLY suspension set of 4 or 5 permits already-admitted result submission. SHRINK, DERISK_ONLY and FULL_STOP block submission.",
+    "Cancellation, refunds, result acceptance and rejection retain their original order authorization and deadlines outside this provider binding.",
+    "Response documents do not expand the compiled action policy. The version defines the same maximum permitted actions for every responseRef.",
+    "The binding can never be replaced on an existing pool.",
+    "The fixed guardian and closed resume-holder set are checked independently on every ancestor, not only the leaf.",
+    "A nonzero responseRef on any suspended ancestor closes continuation because this prototype cannot interpret its response document; a zero reference uses only this pinned profile and its bit-set policy."
+  ],
+  "limitations": [
+    "No proof of capacity outside this pool, actual computation, or report quality.",
+    "Refund and settlement rights have a separate pre-existing authority and are not frozen by this provider binding."
+  ]
+}

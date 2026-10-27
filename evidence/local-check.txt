@@ -1,0 +1,326 @@
+ASF integrity: 14 pinned files; 3 canonical documents; consistent parameters/profile
+Solidity tests separately verify the compiled Keccak-256 document commitments.
+forge Version: 1.7.1
+Commit SHA: 4072e48705af9d93e3c0f6e29e93b5e9a40caed8
+Build Timestamp: 2026-05-08T07:54:31.470926000Z (1778226871)
+Build Profile: dist
+
+added 1 package in 295ms
+Compiling 1 files with Solc 0.8.26
+Solc 0.8.26 finished in 514.79ms
+Compiler run successful!
+
+╭--------------------------+------------------+-------------------+--------------------+---------------------╮
+| Contract                 | Runtime Size (B) | Initcode Size (B) | Runtime Margin (B) | Initcode Margin (B) |
++============================================================================================================+
+| ASFCapacityMarket        | 16,510           | 18,104            | 8,066              | 31,048              |
+|--------------------------+------------------+-------------------+--------------------+---------------------|
+| ASFKeys                  | 85               | 135               | 24,491             | 49,017              |
+|--------------------------+------------------+-------------------+--------------------+---------------------|
+| ASFTypes                 | 85               | 135               | 24,491             | 49,017              |
+|--------------------------+------------------+-------------------+--------------------+---------------------|
+| Arrays                   | 85               | 135               | 24,491             | 49,017              |
+|--------------------------+------------------+-------------------+--------------------+---------------------|
+| Bytes                    | 85               | 135               | 24,491             | 49,017              |
+|--------------------------+------------------+-------------------+--------------------+---------------------|
+| CapacityReservations     | 13,563           | 13,985            | 11,013             | 35,167              |
+|--------------------------+------------------+-------------------+--------------------+---------------------|
+| CapacitySafetyPolicy     | 85               | 135               | 24,491             | 49,017              |
+|--------------------------+------------------+-------------------+--------------------+---------------------|
+| Comparators              | 85               | 135               | 24,491             | 49,017              |
+|--------------------------+------------------+-------------------+--------------------+---------------------|
+| DirectBookingMarket      | 8,798            | 9,189             | 15,778             | 39,963              |
+|--------------------------+------------------+-------------------+--------------------+---------------------|
+| ECDSA                    | 85               | 135               | 24,491             | 49,017              |
+|--------------------------+------------------+-------------------+--------------------+---------------------|
+| ERC1155Utils             | 85               | 135               | 24,491             | 49,017              |
+|--------------------------+------------------+-------------------+--------------------+---------------------|
+| Math                     | 85               | 135               | 24,491             | 49,017              |
+|--------------------------+------------------+-------------------+--------------------+---------------------|
+| MessageHashUtils         | 85               | 135               | 24,491             | 49,017              |
+|--------------------------+------------------+-------------------+--------------------+---------------------|
+| MockPaymentToken         | 3,345            | 3,812             | 21,231             | 45,340              |
+|--------------------------+------------------+-------------------+--------------------+---------------------|
+| OrderHarness             | 2,212            | 2,359             | 22,364             | 46,793              |
+|--------------------------+------------------+-------------------+--------------------+---------------------|
+| Panic                    | 85               | 135               | 24,491             | 49,017              |
+|--------------------------+------------------+-------------------+--------------------+---------------------|
+| RevertingAdmissionMarket | 8,832            | 9,227             | 15,744             | 39,925              |
+|--------------------------+------------------+-------------------+--------------------+---------------------|
+| SafeCast                 | 85               | 135               | 24,491             | 49,017              |
+|--------------------------+------------------+-------------------+--------------------+---------------------|
+| SafeERC20                | 85               | 135               | 24,491             | 49,017              |
+|--------------------------+------------------+-------------------+--------------------+---------------------|
+| ShortStrings             | 85               | 135               | 24,491             | 49,017              |
+|--------------------------+------------------+-------------------+--------------------+---------------------|
+| SignatureChecker         | 85               | 135               | 24,491             | 49,017              |
+|--------------------------+------------------+-------------------+--------------------+---------------------|
+| SignedBookingMarket      | 11,300           | 12,568            | 13,276             | 36,584              |
+|--------------------------+------------------+-------------------+--------------------+---------------------|
+| SignedMath               | 85               | 135               | 24,491             | 49,017              |
+|--------------------------+------------------+-------------------+--------------------+---------------------|
+| SigningWallet            | 1,018            | 1,149             | 23,558             | 48,003              |
+|--------------------------+------------------+-------------------+--------------------+---------------------|
+| SlotDerivation           | 85               | 135               | 24,491             | 49,017              |
+|--------------------------+------------------+-------------------+--------------------+---------------------|
+| StorageSlot              | 85               | 135               | 24,491             | 49,017              |
+|--------------------------+------------------+-------------------+--------------------+---------------------|
+| Strings                  | 85               | 135               | 24,491             | 49,017              |
+╰--------------------------+------------------+-------------------+--------------------+---------------------╯
+
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+   ╭▸ src/SignedBookingMarket.sol:55:20
+   │
+55 │                 || block.timestamp >= request.validUntil || request.validUntil > request.holdUntil
+   │                    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: https://book.getfoundry.sh/reference/forge/forge-lint#block-timestamp
+
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+    ╭▸ src/MarketEscrow.sol:160:13
+    │
+160 │         if (block.timestamp >= order.settlementDeadline) revert DeadlinePassed();
+    │             ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://book.getfoundry.sh/reference/forge/forge-lint#block-timestamp
+
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+    ╭▸ src/MarketEscrow.sol:172:13
+    │
+172 │         if (block.timestamp >= order.settlementDeadline) revert DeadlinePassed();
+    │             ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://book.getfoundry.sh/reference/forge/forge-lint#block-timestamp
+
+warning[unsafe-typecast]: typecasts that can truncate values should be checked
+    ╭▸ test/TestSupport.sol:102:45
+    │
+102 │         if (result.length >= 4) hookError = bytes4(result);
+    │                                             ━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'bytes4' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://book.getfoundry.sh/reference/forge/forge-lint#unsafe-typecast
+
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+   ╭▸ src/CapacityReservations.sol:99:51
+   │
+99 │                 || config.maxHoldDuration == 0 || block.timestamp >= config.windowStart
+   │                                                   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: https://book.getfoundry.sh/reference/forge/forge-lint#block-timestamp
+
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+    ╭▸ src/CapacityReservations.sol:132:51
+    │
+132 │         return (balanceOf(address(this), poolId), block.timestamp < pool.config.windowStart);
+    │                                                   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://book.getfoundry.sh/reference/forge/forge-lint#block-timestamp
+
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+    ╭▸ src/MarketEscrow.sol:199:24
+    │
+199 │                     && block.timestamp >= order.binding.windowEnd
+    │                        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://book.getfoundry.sh/reference/forge/forge-lint#block-timestamp
+
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+    ╭▸ src/MarketEscrow.sol:211:17
+    │
+211 │             if (block.timestamp < order.settlementDeadline) revert RefundUnavailable();
+    │                 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://book.getfoundry.sh/reference/forge/forge-lint#block-timestamp
+
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+    ╭▸ src/CapacityReservations.sol:144:20
+    │
+144 │                 || block.timestamp >= pool.config.windowStart || holdUntil <= block.timestamp
+    │                    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://book.getfoundry.sh/reference/forge/forge-lint#block-timestamp
+
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+    ╭▸ src/CapacityReservations.sol:144:66
+    │
+144 │                 || block.timestamp >= pool.config.windowStart || holdUntil <= block.timestamp
+    │                                                                  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://book.getfoundry.sh/reference/forge/forge-lint#block-timestamp
+
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+    ╭▸ src/CapacityReservations.sol:146:20
+    │
+146 │                 || uint256(holdUntil) - block.timestamp > pool.config.maxHoldDuration
+    │                    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://book.getfoundry.sh/reference/forge/forge-lint#block-timestamp
+
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+    ╭▸ src/CapacityReservations.sol:167:13
+    │
+167 │         if (block.timestamp >= r.holdUntil) revert DeadlinePassed();
+    │             ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://book.getfoundry.sh/reference/forge/forge-lint#block-timestamp
+
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+    ╭▸ src/CapacityReservations.sol:188:13
+    │
+188 │             block.timestamp >= config.windowStart && block.timestamp < config.windowEnd
+    │             ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://book.getfoundry.sh/reference/forge/forge-lint#block-timestamp
+
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+    ╭▸ src/CapacityReservations.sol:188:54
+    │
+188 │             block.timestamp >= config.windowStart && block.timestamp < config.windowEnd
+    │                                                      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://book.getfoundry.sh/reference/forge/forge-lint#block-timestamp
+
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+    ╭▸ src/CapacityReservations.sol:220:17
+    │
+220 │             if (block.timestamp >= r.holdUntil) revert DeadlinePassed();
+    │                 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://book.getfoundry.sh/reference/forge/forge-lint#block-timestamp
+
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+    ╭▸ src/CapacityReservations.sol:222:17
+    │
+222 │             if (block.timestamp >= _pools[r.poolId].config.windowStart) revert DeadlinePassed();
+    │                 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://book.getfoundry.sh/reference/forge/forge-lint#block-timestamp
+
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+    ╭▸ src/CapacityReservations.sol:232:17
+    │
+232 │             if (block.timestamp < r.holdUntil) revert TooEarly();
+    │                 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://book.getfoundry.sh/reference/forge/forge-lint#block-timestamp
+
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+    ╭▸ src/CapacityReservations.sol:234:17
+    │
+234 │             if (block.timestamp < _pools[r.poolId].config.windowEnd) revert TooEarly();
+    │                 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://book.getfoundry.sh/reference/forge/forge-lint#block-timestamp
+
+Compiling 3 files with Solc 0.8.26
+Solc 0.8.26 finished in 1.79s
+Compiler run successful!
+
+Ran 4 tests for test/Reservations.t.sol:SignedHoldsTest
+[PASS] test_ERC1271ContractBuyerCanAuthorizeHold() (gas: 558891)
+[PASS] test_RelayerCannotAlterTermsOrReplaySignature() (gas: 344723)
+[PASS] test_SignatureExpiryIsExclusive() (gas: 28549)
+[PASS] test_SignaturesAreBoundToChainAndMarket() (gas: 2384989)
+Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 10.15ms (5.79ms CPU time)
+
+Ran 26 tests for test/Reservations.t.sol:ReservationsTest
+[PASS] testDemo_TwoMarketsShareTenReportAdmissions() (gas: 1269297)
+Logs:
+  After direct market reserves six: remaining: 4
+  After signed market reserves four: remaining: 0
+  Consumed quota after success and timeout refund: 10
+  Provider payment: 600
+
+[PASS] testFuzz_TwoMarketsCannotOverbook(uint8,uint8) (runs: 256, μ: 475163, ~: 525572)
+[PASS] test_2135InterfacesAndRealConsumptionBurnEvents() (gas: 694291)
+[PASS] test_AcceptAtSettlementDeadlineFailsThenRefunds() (gas: 642005)
+[PASS] test_AdmissionAtEndIsForbidden() (gas: 593691)
+[PASS] test_AuthorityAndBoundMarketAreEnforced() (gas: 717436)
+[PASS] test_CancelAtomicallyReturnsInventoryAndFundsExactlyOnce() (gas: 593057)
+[PASS] test_DirectLedgerReleaseStillAllowsRefundToBuyer() (gas: 583092)
+[PASS] test_EveryImmutableBindingFieldIsRecheckedBeforeConsumption() (gas: 944409)
+[PASS] test_ExactAdmissionWindowAndCancellationBoundaries() (gas: 692614)
+[PASS] test_FailedFundsOrNonExactTransferRollBackEverything() (gas: 1235706)
+[PASS] test_FailedOrderAdmissionRollsBackConsumption() (gas: 2705150)
+[PASS] test_FailedRefundRollsBackInventoryRelease() (gas: 636874)
+[PASS] test_HoldExpiryRequiresCleanupAndCannotConfirmAtDeadline() (gas: 602943)
+[PASS] test_IncompatibleBindingRollsBackFunding() (gas: 3694597)
+[PASS] test_InvalidHoldsAndUnknownRecords() (gas: 313113)
+[PASS] test_InvalidPoolParametersAndImmutableOffer() (gas: 397333)
+[PASS] test_LastUnitHasOnlyOneWinner() (gas: 534630)
+[PASS] test_NoAllowanceCannotConfirm() (gas: 578913)
+[PASS] test_OrderAndRequestReplayRejectedAndConsumeDataBound() (gas: 1522224)
+[PASS] test_PaymentCallbackCannotReenterConfirmationOrRefund() (gas: 697082)
+[PASS] test_ReceiptCustodyCannotBeDrainedByProviderApproval() (gas: 690987)
+[PASS] test_RefundCanAlsoExpireUnusedConfirmationAtomically() (gas: 582194)
+[PASS] test_RejectRefundsButDoesNotRestoreQuota() (gas: 648690)
+[PASS] test_ThirdPartyExpiryDoesNotStrandFunds() (gas: 609308)
+[PASS] test_WorkFailureRefundNeverReissuesConsumedQuota() (gas: 630576)
+Suite result: ok. 26 passed; 0 failed; 0 skipped; finished in 32.15ms (33.50ms CPU time)
+
+Ran 24 tests for test/ASFCapacity.t.sol:ASFCapacityTest
+[PASS] testDemo_ASFSuspensionKeepsRefundAndExplicitContinuationDistinct() (gas: 2488100)
+Logs:
+  Buyer refund while parent is suspended: 100
+  Payment for already-submitted work under independent order authority: 100
+  Consumed quota remains consumed: 1
+
+[PASS] testFuzz_ASFAllSuspensionSetsHaveExplicitAdmissionAndContinuationPolicy(uint8) (runs: 256, μ: 2327344, ~: 2323406)
+[PASS] test_ASFActiveLifecycleUsesActualRegistriesAndPinnedDocuments() (gas: 1484081)
+[PASS] test_ASFAdopterCannotResumeGuardianPauseOrReplacePinnedBinding() (gas: 1251535)
+[PASS] test_ASFAlreadySubmittedResultRetainsBuyerSettlementAuthority() (gas: 1522432)
+[PASS] test_ASFAncestorWithExtraResumeKeyIsRejectedEvenIfLeafLooksValid() (gas: 1437426)
+[PASS] test_ASFAuthorityReferenceAndParentParametersAreChecked() (gas: 1819002)
+[PASS] test_ASFBindingExpiresBeforeOrderDeadlineAndBlocksResultSubmission() (gas: 2234808)
+[PASS] test_ASFEssentialOnlyDoesNotAuthorizeUnadmittedWork() (gas: 1195959)
+[PASS] test_ASFExpiryAtExactBoundaryClosesContinuationButNotRecovery() (gas: 1455433)
+[PASS] test_ASFFullStopDominatesEssentialChildAndParentUnion() (gas: 1664159)
+[PASS] test_ASFFullStopPreservesBuyerCancellationButNotNewCommitments() (gas: 1295651)
+[PASS] test_ASFFullStopPreservesDirectReleaseAndThirdPartyExpiryRecovery() (gas: 2055351)
+[PASS] test_ASFMalformedCheckResponseIsUnknown() (gas: 1363106)
+[PASS] test_ASFMixedAdaptersCannotClaimPoolWideEnforcement() (gas: 2132057)
+[PASS] test_ASFParentPauseBlocksHeldConfirmationWithoutTakingPayment() (gas: 832598)
+[PASS] test_ASFPaymentCallbackSuspensionRollsBackEntireConfirmation() (gas: 6536554)
+[PASS] test_ASFPublishedNewVersionCannotChangePinnedPoolPolicy() (gas: 1293361)
+[PASS] test_ASFRevertingCheckNeverAuthorizesAndDoesNotStrandExpiredEscrow() (gas: 1366571)
+[PASS] test_ASFTerminatedAncestorCannotBeTreatedAsContinuingSuspension() (gas: 1616667)
+[PASS] test_ASFUnconfiguredPoolCannotHoldAndOnlyProviderCanConfigure() (gas: 417664)
+[PASS] test_ASFUninterpretedResponseDocumentClosesContinuation() (gas: 1505394)
+[PASS] test_ASFUnknownDependencyBlocksRiskAndPreservesRefundAuthority() (gas: 1399444)
+[PASS] test_ASFWrongDocumentOrUnsupportedRequiredProfileCannotDeploy() (gas: 405090)
+Suite result: ok. 24 passed; 0 failed; 0 skipped; finished in 162.73ms (197.04ms CPU time)
+
+Ran 1 test for test/Invariants.t.sol:ReservationInvariants
+[PASS] invariant_InventoryReceiptsAndEscrowRemainConserved() (runs: 128, calls: 8192, reverts: 0)
+
+╭------------------+----------+-------+---------+----------╮
+| Contract         | Selector | Calls | Reverts | Discards |
++==========================================================+
+| LifecycleHandler | admit    | 953   | 0       | 0        |
+|------------------+----------+-------+---------+----------|
+| LifecycleHandler | advance  | 892   | 0       | 0        |
+|------------------+----------+-------+---------+----------|
+| LifecycleHandler | cancel   | 917   | 0       | 0        |
+|------------------+----------+-------+---------+----------|
+| LifecycleHandler | confirm  | 932   | 0       | 0        |
+|------------------+----------+-------+---------+----------|
+| LifecycleHandler | expire   | 887   | 0       | 0        |
+|------------------+----------+-------+---------+----------|
+| LifecycleHandler | finish   | 880   | 0       | 0        |
+|------------------+----------+-------+---------+----------|
+| LifecycleHandler | hold     | 907   | 0       | 0        |
+|------------------+----------+-------+---------+----------|
+| LifecycleHandler | refund   | 942   | 0       | 0        |
+|------------------+----------+-------+---------+----------|
+| LifecycleHandler | release  | 882   | 0       | 0        |
+╰------------------+----------+-------+---------+----------╯
+
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 3.09s (3.08s CPU time)
+
+Ran 4 test suites in 3.10s (3.30s CPU time): 55 tests passed, 0 failed, 0 skipped (55 total tests)

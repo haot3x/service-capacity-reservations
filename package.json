@@ -1,0 +1,10 @@
+{
+  "name": "service-capacity-reservations",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "author": "Ted (@haot3x)",
+  "devDependencies": {
+    "@openzeppelin/contracts": "5.4.0"
+  }
+}
