@@ -11,6 +11,7 @@ import {ASFTypes as T} from "../vendor/asf/ASFTypes.sol";
 import {ASFKeys} from "../vendor/asf/libraries/ASFKeys.sol";
 import {ASFBindingRegistry} from "../vendor/asf/ASFBindingRegistry.sol";
 import {ASFSpecificationRegistry} from "../vendor/asf/ASFSpecificationRegistry.sol";
+import {IASFBindingRegistry} from "../vendor/asf/interfaces/IASFBindingRegistry.sol";
 import {IASFSpecificationRegistry} from "../vendor/asf/interfaces/IASFSpecificationRegistry.sol";
 
 contract ASFCapacityTest is TestSupport {
@@ -116,6 +117,11 @@ contract ASFCapacityTest is TestSupport {
         safety.suspend(id, flags, bytes32(0), keccak256("incident"));
     }
 
+    function _selfPause(bytes32 id, uint8 flags) private {
+        vm.prank(PROVIDER);
+        safety.suspend(id, flags, bytes32(0), bytes32(0));
+    }
+
     function _resume(bytes32 id) private {
         vm.prank(guardian);
         safety.resume(id, keccak256("resolved"));
@@ -132,6 +138,8 @@ contract ASFCapacityTest is TestSupport {
     }
 
     function test_ASFActiveLifecycleUsesActualRegistriesAndPinnedDocuments() public {
+        yes(type(IASFBindingRegistry).interfaceId == bytes4(0xcff7f826));
+        yes(safety.supportsInterface(type(IASFBindingRegistry).interfaceId));
         yes(
             Policy.SPECIFICATION == keccak256(bytes(vm.readFile("examples/asf/specification.canonical.json")))
         );
@@ -180,7 +188,7 @@ contract ASFCapacityTest is TestSupport {
         _pause(root, T.RESTRICT_NO_NEW_RISK | T.RESTRICT_DERISK_ONLY);
         (T.Verdict v, T.Reason r, uint8 flags) = market.safetyState(pool);
         eq(uint256(v), uint256(T.Verdict.NotSatisfied));
-        eq(uint256(r), uint256(T.Reason.ParentNotSatisfied));
+        eq(uint256(r), uint256(T.Reason.StoppedByIntervener));
         eq(flags, 9);
         eq(safety.bindingOf(leaf).restrictions, 0);
         vm.prank(BUYER);
@@ -193,11 +201,11 @@ contract ASFCapacityTest is TestSupport {
         _sums();
     }
 
-    function testFuzz_ASFAllSuspensionSetsHaveExplicitAdmissionAndContinuationPolicy(uint8 raw) public {
+    function testFuzz_ASFAdopterSuspensionSetsHaveExplicitAdmissionAndContinuationPolicy(uint8 raw) public {
         uint8 flags = uint8(uint256(raw) % 31 + 1);
         uint256 held = _hold();
         uint256 funded = _book();
-        _pause(root, flags);
+        _selfPause(root, flags);
         vm.prank(BUYER);
         vm.expectPartialRevert(ASFCapacityMarket.SafetyDenied.selector);
         market.hold(pool, 1, 1_500);
@@ -210,7 +218,7 @@ contract ASFCapacityTest is TestSupport {
         market.admit(funded);
         _resume(root);
         _admit(funded);
-        _pause(root, flags);
+        _selfPause(root, flags);
         bool allowed = flags == 4 || flags == 5;
         vm.prank(PROVIDER);
         if (!allowed) vm.expectPartialRevert(ASFCapacityMarket.SafetyDenied.selector);
@@ -237,6 +245,108 @@ contract ASFCapacityTest is TestSupport {
         _sums();
     }
 
+    function _stop() private view returns (T.Stop memory) {
+        return safety.stopOf(PROVIDER, ASFKeys.accountSubjectKey(PROVIDER), address(specs), specId, guardian);
+    }
+
+    function _liftStop(address actor) private {
+        vm.prank(actor);
+        safety.liftStop(
+            PROVIDER, ASFKeys.accountSubjectKey(PROVIDER), address(specs), specId, guardian, bytes32(0)
+        );
+    }
+
+    function testFuzz_ASFStandingStopNeverAuthorizesContinuation(uint8 raw) public {
+        uint8 flags = uint8(uint256(raw) % 31 + 1);
+        uint256 id = _book();
+        vm.warp(START);
+        _admit(id);
+        _pause(root, flags);
+        (, T.Reason reason, uint8 actual) = market.safetyState(pool);
+        eq(uint256(reason), uint256(T.Reason.StoppedByIntervener));
+        eq(actual, flags);
+        vm.prank(PROVIDER);
+        vm.expectPartialRevert(ASFCapacityMarket.SafetyDenied.selector);
+        market.submit(id, keccak256("report"));
+        _resume(root);
+        yes(_stop().bindingId == bytes32(0));
+        vm.prank(PROVIDER);
+        market.submit(id, keccak256("report"));
+        _sums();
+    }
+
+    function test_ASFSuspendedLeafCannotMaskStandingStopFromTerminatedSibling() public {
+        uint256 id = _book();
+        vm.warp(START);
+        _admit(id);
+        T.BindingInput memory i = _input(pool, bytes32(0), keccak256("sibling"));
+        vm.prank(PROVIDER);
+        bytes32 sibling = safety.adopt(i);
+        _pause(sibling, T.RESTRICT_FULL_STOP);
+        vm.prank(PROVIDER);
+        safety.terminate(sibling, bytes32(0));
+        _selfPause(leaf, T.RESTRICT_ESSENTIAL_ONLY);
+        (, T.Reason reason, uint8 flags) = market.safetyState(pool);
+        eq(uint256(reason), uint256(T.Reason.Suspended));
+        eq(flags, T.RESTRICT_ESSENTIAL_ONLY);
+        yes(_stop().bindingId == sibling);
+        vm.prank(PROVIDER);
+        vm.expectPartialRevert(ASFCapacityMarket.SafetyDenied.selector);
+        market.submit(id, keccak256("report"));
+        vm.prank(PROVIDER);
+        vm.expectRevert();
+        safety.liftStop(
+            PROVIDER, ASFKeys.accountSubjectKey(PROVIDER), address(specs), specId, guardian, bytes32(0)
+        );
+        address lifter = address(0x11F7);
+        vm.prank(guardian);
+        safety.setStopLifter(lifter);
+        _liftStop(lifter);
+        // Lifting the stop does not resume either record. Only our narrow continuation now applies.
+        eq(uint256(safety.bindingOf(leaf).state), uint256(T.BindingState.Suspended));
+        eq(uint256(safety.bindingOf(sibling).state), uint256(T.BindingState.Terminated));
+        vm.prank(PROVIDER);
+        market.submit(id, keccak256("report"));
+        _sums();
+    }
+
+    function test_ASFFreshBindingRemainsStoppedAfterOriginalTermination() public {
+        _pause(root, T.RESTRICT_FULL_STOP);
+        vm.prank(PROVIDER);
+        safety.terminate(root, bytes32(0));
+        T.BindingInput memory i = _input(pool, bytes32(0), keccak256("fresh"));
+        vm.prank(PROVIDER);
+        bytes32 fresh = safety.adopt(i);
+        T.RequirementSet memory req = market.requirement(pool);
+        (T.Verdict verdict, T.Reason reason, uint8 flags) = safety.checkBinding(fresh, req.clauses[0]);
+        eq(uint256(verdict), uint256(T.Verdict.NotSatisfied));
+        eq(uint256(reason), uint256(T.Reason.StoppedByIntervener));
+        eq(flags, T.RESTRICT_FULL_STOP);
+        _liftStop(guardian);
+        (verdict,,) = safety.checkBinding(fresh, req.clauses[0]);
+        eq(uint256(verdict), uint256(T.Verdict.Satisfied));
+        vm.prank(PROVIDER);
+        vm.expectRevert(ASFCapacityMarket.SafetyAlreadyConfigured.selector);
+        market.configureSafety(pool, fresh);
+    }
+
+    function test_ASFUnavailableStopQueryClosesOptionalContinuation() public {
+        uint256 id = _book();
+        vm.warp(START);
+        _admit(id);
+        _selfPause(leaf, T.RESTRICT_ESSENTIAL_ONLY);
+        vm.mockCallRevert(
+            address(safety), abi.encodeWithSelector(safety.stopOf.selector), bytes("unavailable")
+        );
+        vm.prank(PROVIDER);
+        vm.expectPartialRevert(ASFCapacityMarket.SafetyDenied.selector);
+        market.submit(id, keccak256("report"));
+        vm.warp(DEADLINE);
+        market.claimRefund(id);
+        eq(token.balanceOf(BUYER), 100_000);
+        _sums();
+    }
+
     function test_ASFEssentialOnlyDoesNotAuthorizeUnadmittedWork() public {
         uint256 id = _book();
         _pause(root, T.RESTRICT_ESSENTIAL_ONLY);
@@ -249,7 +359,7 @@ contract ASFCapacityTest is TestSupport {
         uint256 id = _book();
         vm.warp(START);
         _admit(id);
-        vm.prank(guardian);
+        vm.prank(PROVIDER);
         safety.suspend(root, T.RESTRICT_ESSENTIAL_ONLY, keccak256("unread response"), bytes32(0));
         vm.prank(PROVIDER);
         vm.expectPartialRevert(ASFCapacityMarket.SafetyDenied.selector);
@@ -472,6 +582,7 @@ contract ASFCapacityTest is TestSupport {
         eq(token.balanceOf(BUYER), 100_000);
         eq(market.escrowLiability(), 0);
         eq(uint256(safety.bindingOf(root).state), uint256(T.BindingState.Active));
+        yes(_stop().bindingId == bytes32(0));
         token.setHook(address(0), "");
         vm.prank(BUYER);
         market.confirm(id);
@@ -537,7 +648,7 @@ contract ASFCapacityTest is TestSupport {
         _resume(root);
         vm.warp(START);
         _admit(workId);
-        _pause(root, T.RESTRICT_NO_NEW_RISK | T.RESTRICT_ESSENTIAL_ONLY);
+        _selfPause(root, T.RESTRICT_NO_NEW_RISK | T.RESTRICT_ESSENTIAL_ONLY);
         vm.prank(PROVIDER);
         market.submit(workId, keccak256("completed report"));
         _resume(root);

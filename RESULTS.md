@@ -1,9 +1,9 @@
 # Local Prototype Results
 
 Author: Ted (@haot3x)
-Recorded local run: 2026-10-26; publication notes: 2026-10-27
+Recorded local run: 2026-10-28
 
-The capacity-reservation baseline and the new ASF consumer integration pass **55 local tests**. The ASF tests run the actual revision-4 reference registries, pinned to commit `64c2e27f2bda90721938327bb08751603a95a459`. This is implementation evidence for a local application profile, not independent interoperability, an audit, or approval of a new ERC.
+The capacity-reservation baseline and the new ASF consumer integration pass **59 local tests**. The ASF tests run the actual revision-7 reference registries, pinned to commit `a76071c0e0ab76c296a0eb878dee1365ce5a78bc`. This is implementation evidence for a local application profile, not independent interoperability, an audit, or approval of a new ERC.
 
 ## Recorded run
 
@@ -11,19 +11,19 @@ Command: `bash scripts/check.sh`, with `FORGE_BIN` selecting the native Forge ex
 
 | Check | Result |
 |---|---|
-| Vendored dependency integrity | 14 files match the pinned manifest; also compared byte-for-byte to the upstream checkout |
+| Vendored dependency integrity | 16 files match the pinned manifest; also compared byte-for-byte to the upstream checkout |
 | Canonical policy documents | 3 byte representations match readable JSON; parameters/profile references agree |
 | JSON Schema validation, separate recorded command | Specification and profile pass the pinned upstream schemas with jsonschema 4.26.0 |
 | Locked npm installation with install scripts disabled | Passed |
 | `forge fmt --check` | Passed; vendored source deliberately excluded |
 | Solidity 0.8.26 build, Cancun, optimizer 200 | Passed |
 | Reservation and signed-hold tests | 30 passed |
-| ASF integration tests | 24 passed |
-| Fuzz tests | 256 quantity cases and 256 ASF suspension-mask cases |
+| ASF integration tests | 28 passed |
+| Fuzz tests | 256 quantity cases, 256 adopter-suspension cases and 256 standing-stop cases |
 | Stateful inventory/escrow invariant | Passed: 128 sequences, depth 64, 8,192 handler calls |
-| Final total | 55 passed; 0 failed; 0 skipped |
+| Final total | 59 passed; 0 failed; 0 skipped |
 | Fuzz seed | `0x20261026` |
-| Targeted mutation checks | Both omissions caught by their corresponding tests; original source restored before the full passing run |
+| Targeted mutation checks | Independent stop-query omission caught by the terminated-sibling regression; source restored and that regression passed |
 | Forge | 1.7.1, commit `4072e48705af9d93e3c0f6e29e93b5e9a40caed8` |
 | OpenZeppelin Contracts | 5.4.0, locked npm dependency |
 
@@ -31,7 +31,8 @@ Evidence:
 
 - [Full local check](./evidence/local-check.txt)
 - [Schema validation](./evidence/asf-schema-check.txt)
-- [Targeted mutation failures](./evidence/asf-mutation-check.txt)
+- [Revision-7 standing-stop mutation failure](./evidence/asf-stop-mutation-check.txt)
+- [Historical revision-4 mutation failures](./evidence/asf-mutation-check.txt)
 - [Current source and evidence SHA-256 manifest](./evidence/SHA256SUMS)
 - [Historical 2026-10-23 baseline output](./evidence/2026-10-23-baseline/local-check.txt)
 
@@ -50,18 +51,15 @@ The ASF demonstration observes:
 | Suspend parent with `NO_NEW_RISK + DERISK_ONLY` | Covered new commitments stop |
 | Buyer cancels a funded, unadmitted order before the window | Buyer receives 100 raw test-token units |
 | Guardian resumes, provider admits a separate order | One unit becomes permanently consumed |
-| Suspend parent with `NO_NEW_RISK + ESSENTIAL_ONLY` | Already-admitted result submission succeeds |
+| Provider self-suspends parent with `NO_NEW_RISK + ESSENTIAL_ONLY`, with no standing guardian stop | Already-admitted result submission succeeds |
 | Add full stop after submission | Further covered provider work stops; buyer retains original evaluation authority |
 | Buyer accepts that submitted result | Provider receives 100 raw test-token units; consumed quota remains one |
 
 The action policy and its explicit escrow scope are in [ASF-INTEGRATION.md](./ASF-INTEGRATION.md). The guardian cannot accept an order on the buyer's behalf.
 
-Two integration regressions are demonstrated by temporarily omitting individual checks:
+The revision-7 mutation removes `_standingStopAbsent` from the continuation condition. A guardian stops an independent sibling, that sibling is terminated, and the provider self-suspends the pinned leaf with `ESSENTIAL_ONLY`. The registry reports `Suspended` first with flags 4, while the full standing stop survives. Without the consumer's separate query, submission succeeds and the regression fails. Restoring the guard makes the same test pass. This is a consumer-policy regression, not a claimed upstream defect.
 
-1. Removing the safety recheck after token transfer allows a callback-triggered suspension to be missed. The callback test then fails because confirmation succeeds unexpectedly.
-2. Checking resume holders only on the leaf admits an ancestor with another resume key. The ancestor-policy test then fails because configuration succeeds unexpectedly.
-
-Both mutations were rejected by the tests, sources were restored, and the full suite passed afterward. The second case is a stronger local consumer rule than ASF's leaf clause, not an assertion that the upstream clause violates its specification.
+The earlier revision-4 mutation log is retained as historical evidence for payment callback and ancestor resume-holder checks. Those two mutations were not rerun in this revision.
 
 ## Build observations
 
@@ -70,7 +68,7 @@ Both mutations were rejected by the tests, sources were restored, and the full s
 | CapacityReservations | 13,563 |
 | DirectBookingMarket | 8,798 |
 | SignedBookingMarket | 11,300 |
-| ASFCapacityMarket | 16,510 |
+| ASFCapacityMarket | 17,082 |
 
 All four are below the configured runtime code-size limit. The base direct/signed adapter sizes remain unchanged. The local test EVM successfully deploys both actual ASF registries; the production build-size table above lists our consumer contracts, not an upstream deployment certification.
 
@@ -85,6 +83,6 @@ Forge lint reports timestamp-comparison warnings and the existing intentional te
 - No implementation of ERC-5006/non-token alternatives or ERC-8183/8414/8448 order integrations.
 - Free repeated holds still have no anti-squatting policy.
 - The recorded run above is local. Public source: https://github.com/haot3x/service-capacity-reservations. Remote results are available in GitHub Actions; they are separate from the archived local log. The complete ASF upstream suite was not replayed.
-- The vendored code remains revision 4. Upstream revision 6 has a new standing-stop model and interface; compatibility with it has not been tested.
+- Compatibility is limited to the pinned revision-7 commit. Future upstream changes require a new review.
 
-Next: request focused feedback on the consumer scope, validate the newer standing-stop model separately, and connect an independently implemented order system before arguing for a new standard.
+Next: review the tested standing-stop integration with the ASF author, then connect an independently implemented order system before arguing for a new standard.
