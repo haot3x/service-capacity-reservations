@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.20;
 
-/// @title  ASFTypes — shared types of the Agent Safety and Security Framework (ASF)
+/// @title  ASFTypes — shared types of the Agent Safety Framework (ASF)
 /// @notice Two registry objects (Safety Specification, Safety Binding), the binding lifecycle,
 ///         the response-requirement bit set of suspensions, the enforcement-location bit set,
 ///         intervener rights and the requirement grammar consumed by `check`.
@@ -57,6 +57,9 @@ library ASFTypes {
     /// @notice Maximum depth of a derived-binding chain (root has depth 0).
     uint8 internal constant MAX_DEPTH = 8;
 
+    /// @notice Maximum number of interveners of one binding.
+    uint256 internal constant MAX_INTERVENERS = 16;
+
     /// @notice An account entitled to some lifecycle transitions of a binding besides the adopter.
     struct Intervener {
         address account;
@@ -102,9 +105,39 @@ library ASFTypes {
         uint64 createdAt;
         uint64 stateChangedAt;
         BindingState state;
-        uint8 restrictions;        // bit set of RESTRICT_* while Suspended, else 0
-        bytes32 responseRef;       // content hash of the response document while Suspended, else 0
-        address suspendedBy;       // account that recorded the current suspension while Suspended, else 0
+        uint8 restrictions;        // bit set of RESTRICT_* of the current or last suspension; cleared by resume, kept through termination
+        bytes32 responseRef;       // content hash of its response document; cleared by resume, kept through termination
+        address suspendedBy;       // account that recorded it; cleared by resume, kept through termination
+    }
+
+    /// @notice A standing stop: an intervener's suspensions recorded against the adopter for the subject and the
+    ///         specification, independently of the bindings they were recorded through. The stop is the
+    ///         intervener's: it outlives the termination of those bindings, grows by union when the intervener
+    ///         suspends another binding under the same key, and is lifted only by the intervener or by the lifter
+    ///         the intervener named (Section 8.5).
+    struct Stop {
+        bytes32 bindingId;         // binding of the latest suspension recorded into the stop; zero when none stands
+        uint8 restrictions;        // union of the response sets of the suspensions recorded into it
+        bytes32 responseRef;       // response document of the latest suspension that supplied one
+        uint64 since;              // when the stop was first recorded
+    }
+
+    /// @notice Storage of a binding registry, shared with the externally linked evaluation library.
+    struct Store {
+        mapping(bytes32 => Binding) bindings;
+        mapping(bytes32 => Intervener[]) interveners;
+        mapping(bytes32 => mapping(address => uint8)) rights;
+        mapping(bytes32 => Stop) stops; // keyed by stopKey(adopter, subjectKey, specRegistry, specId, intervener)
+        mapping(address => address) stopLifters; // intervener -> the one account it named to lift its stops
+        mapping(bytes32 => mapping(address => bytes32[])) bySubject; // (subjectKey, adopter) -> binding ids
+        mapping(bytes32 => mapping(address => bytes32[])) byScope;   // (scopeKey, adopter) -> binding ids
+    }
+
+    /// @notice Key of a standing stop.
+    function stopKey(address adopter, bytes32 subjectKey, address specRegistry, bytes32 specId, address intervener)
+        internal pure returns (bytes32)
+    {
+        return keccak256(abi.encode(adopter, subjectKey, specRegistry, specId, intervener));
     }
 
     // ------------------------------------------------------------------------- requirements
@@ -132,7 +165,9 @@ library ASFTypes {
         EnforcementMismatch,    // 11 — required enforcement locations not all declared
         ParentNotSatisfied,     // 12 — an ancestor binding is not currently satisfied
         SpecRegistryUnavailable,// 13 — the specification registry could not be queried (Unknown)
-        IntervenerMismatch      // 14 — a required intervener is missing or holds fewer rights than required
+        IntervenerMismatch,     // 14 — a required intervener is missing or holds fewer rights than required
+        StoppedByIntervener     // 15 — an account the clause names holds a standing stop against the adopter
+                                //      for the subject and the specification (see the returned restrictions)
     }
 
     /// @notice How the clause results of a requirement set combine.

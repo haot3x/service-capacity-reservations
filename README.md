@@ -8,7 +8,7 @@ A local Solidity prototype for selling ten research-report admissions through tw
 
 Repository: https://github.com/haot3x/service-capacity-reservations
 
-ASF compatibility is pinned to **revision 4**. Upstream revision 6 adds standing stops and changes the binding-registry interface; this snapshot does not claim revision-6 compatibility. See [the version boundary](./ASF-INTEGRATION.md#version-boundary).
+ASF compatibility is pinned to **revision 7**, commit `a76071c0e0ab76c296a0eb878dee1365ce5a78bc`. Standing guardian stops deny covered provider actions, while pre-existing buyer recovery and settlement retain their own authorization. See [the version boundary](./ASF-INTEGRATION.md#version-boundary).
 
 ## Run
 
@@ -33,7 +33,7 @@ Expected demo:
 5. Buyer accepts the six-report order, paying the provider 600 raw token units.
 6. The four-report order times out and refunds its buyer. Consumed quota remains ten.
 
-See [RESULTS.md](./RESULTS.md) for recorded checks and [evidence/local-check.txt](./evidence/local-check.txt) for the run output. The same checks run in [GitHub Actions](https://github.com/haot3x/service-capacity-reservations/actions/workflows/test.yml); see that page for the current remote result. The current run passes **55 tests**, including **24 ASF integration tests**. See [ASF-INTEGRATION.md](./ASF-INTEGRATION.md) for the action matrix, authority boundaries and optional JSON Schema validation command.
+See [RESULTS.md](./RESULTS.md) for recorded checks and [evidence/local-check.txt](./evidence/local-check.txt) for the run output. The same checks run in [GitHub Actions](https://github.com/haot3x/service-capacity-reservations/actions/workflows/test.yml); see that page for the current remote result. The current run passes **59 tests**, including **28 ASF integration tests**. See [ASF-INTEGRATION.md](./ASF-INTEGRATION.md) for the action matrix, authority boundaries and optional JSON Schema validation command.
 
 ## Components
 
@@ -45,7 +45,7 @@ See [RESULTS.md](./RESULTS.md) for recorded checks and [evidence/local-check.txt
 | `MarketEscrow` | Shared experimental escrow: payment, confirmation, admission, result commitment, buyer acceptance/rejection, refund |
 | `IReservationOrder` | Application-specific read interface exposing the bound funded order |
 | `ASFCapacityMarket` | Optional fixed-binding ASF guard for new commitments and result submission; requires a pool with this sole adapter |
-| `vendor/asf` | Unmodified revision-4 reference registries, types, interfaces, key helpers and schemas |
+| `vendor/asf` | Unmodified revision-7 reference registries, types, interfaces, key helpers and schemas |
 
 The adapters have different booking entry points but share the same escrow implementation. They demonstrate two integration paths, **not two independent implementations or real marketplace integrations**. Signed holds do not authorize payment; the buyer must separately confirm and fund the order. The ASF variant is a separate one-adapter pool configuration, so a second unguarded adapter cannot bypass its policy.
 

@@ -12,7 +12,7 @@ import {IASFSpecificationRegistry} from "../../vendor/asf/interfaces/IASFSpecifi
 import {CapacitySafetyPolicy as Policy} from "./CapacitySafetyPolicy.sol";
 
 /// @author Ted (@haot3x)
-/// @notice Local consumer of pinned ASF revision 4. Provider suspension covers commitments and delivery;
+/// @notice Local consumer of pinned ASF revision 7. Provider suspension covers commitments and delivery;
 ///         established escrow recovery and settlement have a separate, pre-accepted authority.
 contract ASFCapacityMarket is DirectBookingMarket {
     IASFBindingRegistry public immutable safetyRegistry;
@@ -125,10 +125,26 @@ contract ASFCapacityMarket is DirectBookingMarket {
         bool continuation = restrictions == T.RESTRICT_ESSENTIAL_ONLY
             || restrictions == (T.RESTRICT_ESSENTIAL_ONLY | T.RESTRICT_NO_NEW_RISK);
         if (
-            verdict == T.Verdict.NotSatisfied && continuation && _responseDocumentsAbsent(poolBinding[poolId])
+            verdict == T.Verdict.NotSatisfied && continuation && _standingStopAbsent(poolId)
+                && _responseDocumentsAbsent(poolBinding[poolId])
                 && (reason == T.Reason.Suspended || reason == T.Reason.ParentNotSatisfied)
         ) return;
         revert SafetyDenied(verdict, reason, restrictions);
+    }
+
+    /// @dev A Suspended leaf is evaluated before standing stops in revision 7. Check the stop independently
+    ///      before granting our optional continuation; the first failure reason alone cannot authorize it.
+    function _standingStopAbsent(uint256 poolId) private view returns (bool) {
+        address provider = registry.getPool(poolId).provider;
+        try safetyRegistry.stopOf(
+            provider, ASFKeys.accountSubjectKey(provider), address(specifications), specificationId, guardian
+        ) returns (
+            T.Stop memory stop
+        ) {
+            return stop.bindingId == bytes32(0);
+        } catch {
+            return false;
+        }
     }
 
     function _check(uint256 poolId, bytes32 id) private view returns (T.Verdict, T.Reason, uint8) {

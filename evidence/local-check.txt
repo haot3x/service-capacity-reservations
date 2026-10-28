@@ -1,19 +1,19 @@
-ASF integrity: 14 pinned files; 3 canonical documents; consistent parameters/profile
+ASF integrity: 16 pinned files; 3 canonical documents; consistent parameters/profile
 Solidity tests separately verify the compiled Keccak-256 document commitments.
 forge Version: 1.7.1
 Commit SHA: 4072e48705af9d93e3c0f6e29e93b5e9a40caed8
 Build Timestamp: 2026-05-08T07:54:31.470926000Z (1778226871)
 Build Profile: dist
 
-added 1 package in 295ms
-Compiling 1 files with Solc 0.8.26
-Solc 0.8.26 finished in 514.79ms
+added 1 package in 247ms
+Compiling 5 files with Solc 0.8.26
+Solc 0.8.26 finished in 527.07ms
 Compiler run successful!
 
 ╭--------------------------+------------------+-------------------+--------------------+---------------------╮
 | Contract                 | Runtime Size (B) | Initcode Size (B) | Runtime Margin (B) | Initcode Margin (B) |
 +============================================================================================================+
-| ASFCapacityMarket        | 16,510           | 18,104            | 8,066              | 31,048              |
+| ASFCapacityMarket        | 17,082           | 18,711            | 7,494              | 30,441              |
 |--------------------------+------------------+-------------------+--------------------+---------------------|
 | ASFKeys                  | 85               | 135               | 24,491             | 49,017              |
 |--------------------------+------------------+-------------------+--------------------+---------------------|
@@ -92,20 +92,6 @@ warning[block-timestamp]: usage of `block.timestamp` in a comparison may be mani
     │
     ╰ help: https://book.getfoundry.sh/reference/forge/forge-lint#block-timestamp
 
-warning[unsafe-typecast]: typecasts that can truncate values should be checked
-    ╭▸ test/TestSupport.sol:102:45
-    │
-102 │         if (result.length >= 4) hookError = bytes4(result);
-    │                                             ━━━━━━━━━━━━━━
-    │
-    ├ note: consider disabling this lint if you're certain the cast is safe
-    │       
-    │       // casting to 'bytes4' is safe because [explain why]
-    │       // forge-lint: disable-next-line(unsafe-typecast)
-    │       
-    │       
-    ╰ help: https://book.getfoundry.sh/reference/forge/forge-lint#unsafe-typecast
-
 warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
    ╭▸ src/CapacityReservations.sol:99:51
    │
@@ -119,22 +105,6 @@ warning[block-timestamp]: usage of `block.timestamp` in a comparison may be mani
     │
 132 │         return (balanceOf(address(this), poolId), block.timestamp < pool.config.windowStart);
     │                                                   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    │
-    ╰ help: https://book.getfoundry.sh/reference/forge/forge-lint#block-timestamp
-
-warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
-    ╭▸ src/MarketEscrow.sol:199:24
-    │
-199 │                     && block.timestamp >= order.binding.windowEnd
-    │                        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    │
-    ╰ help: https://book.getfoundry.sh/reference/forge/forge-lint#block-timestamp
-
-warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
-    ╭▸ src/MarketEscrow.sol:211:17
-    │
-211 │             if (block.timestamp < order.settlementDeadline) revert RefundUnavailable();
-    │                 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     │
     ╰ help: https://book.getfoundry.sh/reference/forge/forge-lint#block-timestamp
 
@@ -178,6 +148,20 @@ warning[block-timestamp]: usage of `block.timestamp` in a comparison may be mani
     │
     ╰ help: https://book.getfoundry.sh/reference/forge/forge-lint#block-timestamp
 
+warning[unsafe-typecast]: typecasts that can truncate values should be checked
+    ╭▸ test/TestSupport.sol:102:45
+    │
+102 │         if (result.length >= 4) hookError = bytes4(result);
+    │                                             ━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │
+    │       // casting to 'bytes4' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │
+    │
+    ╰ help: https://book.getfoundry.sh/reference/forge/forge-lint#unsafe-typecast
+
 warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
     ╭▸ src/CapacityReservations.sol:188:54
     │
@@ -218,8 +202,24 @@ warning[block-timestamp]: usage of `block.timestamp` in a comparison may be mani
     │
     ╰ help: https://book.getfoundry.sh/reference/forge/forge-lint#block-timestamp
 
-Compiling 3 files with Solc 0.8.26
-Solc 0.8.26 finished in 1.79s
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+    ╭▸ src/MarketEscrow.sol:199:24
+    │
+199 │                     && block.timestamp >= order.binding.windowEnd
+    │                        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://book.getfoundry.sh/reference/forge/forge-lint#block-timestamp
+
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+    ╭▸ src/MarketEscrow.sol:211:17
+    │
+211 │             if (block.timestamp < order.settlementDeadline) revert RefundUnavailable();
+    │                 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://book.getfoundry.sh/reference/forge/forge-lint#block-timestamp
+
+Compiling 5 files with Solc 0.8.26
+Solc 0.8.26 finished in 1.50s
 Compiler run successful!
 
 Ran 4 tests for test/Reservations.t.sol:SignedHoldsTest
@@ -227,7 +227,7 @@ Ran 4 tests for test/Reservations.t.sol:SignedHoldsTest
 [PASS] test_RelayerCannotAlterTermsOrReplaySignature() (gas: 344723)
 [PASS] test_SignatureExpiryIsExclusive() (gas: 28549)
 [PASS] test_SignaturesAreBoundToChainAndMarket() (gas: 2384989)
-Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 10.15ms (5.79ms CPU time)
+Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 9.25ms (5.26ms CPU time)
 
 Ran 26 tests for test/Reservations.t.sol:ReservationsTest
 [PASS] testDemo_TwoMarketsShareTenReportAdmissions() (gas: 1269297)
@@ -237,7 +237,7 @@ Logs:
   Consumed quota after success and timeout refund: 10
   Provider payment: 600
 
-[PASS] testFuzz_TwoMarketsCannotOverbook(uint8,uint8) (runs: 256, μ: 475163, ~: 525572)
+[PASS] testFuzz_TwoMarketsCannotOverbook(uint8,uint8) (runs: 256, μ: 479059, ~: 525572)
 [PASS] test_2135InterfacesAndRealConsumptionBurnEvents() (gas: 694291)
 [PASS] test_AcceptAtSettlementDeadlineFailsThenRefunds() (gas: 642005)
 [PASS] test_AdmissionAtEndIsForbidden() (gas: 593691)
@@ -262,39 +262,43 @@ Logs:
 [PASS] test_RejectRefundsButDoesNotRestoreQuota() (gas: 648690)
 [PASS] test_ThirdPartyExpiryDoesNotStrandFunds() (gas: 609308)
 [PASS] test_WorkFailureRefundNeverReissuesConsumedQuota() (gas: 630576)
-Suite result: ok. 26 passed; 0 failed; 0 skipped; finished in 32.15ms (33.50ms CPU time)
+Suite result: ok. 26 passed; 0 failed; 0 skipped; finished in 39.55ms (48.63ms CPU time)
 
-Ran 24 tests for test/ASFCapacity.t.sol:ASFCapacityTest
-[PASS] testDemo_ASFSuspensionKeepsRefundAndExplicitContinuationDistinct() (gas: 2488100)
+Ran 28 tests for test/ASFCapacity.t.sol:ASFCapacityTest
+[PASS] testDemo_ASFSuspensionKeepsRefundAndExplicitContinuationDistinct() (gas: 2620016)
 Logs:
   Buyer refund while parent is suspended: 100
   Payment for already-submitted work under independent order authority: 100
   Consumed quota remains consumed: 1
 
-[PASS] testFuzz_ASFAllSuspensionSetsHaveExplicitAdmissionAndContinuationPolicy(uint8) (runs: 256, μ: 2327344, ~: 2323406)
-[PASS] test_ASFActiveLifecycleUsesActualRegistriesAndPinnedDocuments() (gas: 1484081)
-[PASS] test_ASFAdopterCannotResumeGuardianPauseOrReplacePinnedBinding() (gas: 1251535)
-[PASS] test_ASFAlreadySubmittedResultRetainsBuyerSettlementAuthority() (gas: 1522432)
-[PASS] test_ASFAncestorWithExtraResumeKeyIsRejectedEvenIfLeafLooksValid() (gas: 1437426)
-[PASS] test_ASFAuthorityReferenceAndParentParametersAreChecked() (gas: 1819002)
-[PASS] test_ASFBindingExpiresBeforeOrderDeadlineAndBlocksResultSubmission() (gas: 2234808)
-[PASS] test_ASFEssentialOnlyDoesNotAuthorizeUnadmittedWork() (gas: 1195959)
-[PASS] test_ASFExpiryAtExactBoundaryClosesContinuationButNotRecovery() (gas: 1455433)
-[PASS] test_ASFFullStopDominatesEssentialChildAndParentUnion() (gas: 1664159)
-[PASS] test_ASFFullStopPreservesBuyerCancellationButNotNewCommitments() (gas: 1295651)
-[PASS] test_ASFFullStopPreservesDirectReleaseAndThirdPartyExpiryRecovery() (gas: 2055351)
-[PASS] test_ASFMalformedCheckResponseIsUnknown() (gas: 1363106)
-[PASS] test_ASFMixedAdaptersCannotClaimPoolWideEnforcement() (gas: 2132057)
-[PASS] test_ASFParentPauseBlocksHeldConfirmationWithoutTakingPayment() (gas: 832598)
-[PASS] test_ASFPaymentCallbackSuspensionRollsBackEntireConfirmation() (gas: 6536554)
-[PASS] test_ASFPublishedNewVersionCannotChangePinnedPoolPolicy() (gas: 1293361)
-[PASS] test_ASFRevertingCheckNeverAuthorizesAndDoesNotStrandExpiredEscrow() (gas: 1366571)
-[PASS] test_ASFTerminatedAncestorCannotBeTreatedAsContinuingSuspension() (gas: 1616667)
-[PASS] test_ASFUnconfiguredPoolCannotHoldAndOnlyProviderCanConfigure() (gas: 417664)
-[PASS] test_ASFUninterpretedResponseDocumentClosesContinuation() (gas: 1505394)
-[PASS] test_ASFUnknownDependencyBlocksRiskAndPreservesRefundAuthority() (gas: 1399444)
-[PASS] test_ASFWrongDocumentOrUnsupportedRequiredProfileCannotDeploy() (gas: 405090)
-Suite result: ok. 24 passed; 0 failed; 0 skipped; finished in 162.73ms (197.04ms CPU time)
+[PASS] testFuzz_ASFAdopterSuspensionSetsHaveExplicitAdmissionAndContinuationPolicy(uint8) (runs: 256, μ: 2357426, ~: 2351097)
+[PASS] testFuzz_ASFStandingStopNeverAuthorizesContinuation(uint8) (runs: 256, μ: 1867614, ~: 1865430)
+[PASS] test_ASFActiveLifecycleUsesActualRegistriesAndPinnedDocuments() (gas: 1502173)
+[PASS] test_ASFAdopterCannotResumeGuardianPauseOrReplacePinnedBinding() (gas: 1278485)
+[PASS] test_ASFAlreadySubmittedResultRetainsBuyerSettlementAuthority() (gas: 1612030)
+[PASS] test_ASFAncestorWithExtraResumeKeyIsRejectedEvenIfLeafLooksValid() (gas: 1451246)
+[PASS] test_ASFAuthorityReferenceAndParentParametersAreChecked() (gas: 1828487)
+[PASS] test_ASFBindingExpiresBeforeOrderDeadlineAndBlocksResultSubmission() (gas: 2258443)
+[PASS] test_ASFEssentialOnlyDoesNotAuthorizeUnadmittedWork() (gas: 1281430)
+[PASS] test_ASFExpiryAtExactBoundaryClosesContinuationButNotRecovery() (gas: 1546992)
+[PASS] test_ASFFreshBindingRemainsStoppedAfterOriginalTermination() (gas: 682361)
+[PASS] test_ASFFullStopDominatesEssentialChildAndParentUnion() (gas: 1766189)
+[PASS] test_ASFFullStopPreservesBuyerCancellationButNotNewCommitments() (gas: 1380291)
+[PASS] test_ASFFullStopPreservesDirectReleaseAndThirdPartyExpiryRecovery() (gas: 2146963)
+[PASS] test_ASFMalformedCheckResponseIsUnknown() (gas: 1373679)
+[PASS] test_ASFMixedAdaptersCannotClaimPoolWideEnforcement() (gas: 2132035)
+[PASS] test_ASFParentPauseBlocksHeldConfirmationWithoutTakingPayment() (gas: 912307)
+[PASS] test_ASFPaymentCallbackSuspensionRollsBackEntireConfirmation() (gas: 6768911)
+[PASS] test_ASFPublishedNewVersionCannotChangePinnedPoolPolicy() (gas: 1304003)
+[PASS] test_ASFRevertingCheckNeverAuthorizesAndDoesNotStrandExpiredEscrow() (gas: 1377211)
+[PASS] test_ASFSuspendedLeafCannotMaskStandingStopFromTerminatedSibling() (gas: 2500181)
+[PASS] test_ASFTerminatedAncestorCannotBeTreatedAsContinuingSuspension() (gas: 1712666)
+[PASS] test_ASFUnavailableStopQueryClosesOptionalContinuation() (gas: 1498312)
+[PASS] test_ASFUnconfiguredPoolCannotHoldAndOnlyProviderCanConfigure() (gas: 417614)
+[PASS] test_ASFUninterpretedResponseDocumentClosesContinuation() (gas: 1546909)
+[PASS] test_ASFUnknownDependencyBlocksRiskAndPreservesRefundAuthority() (gas: 1414186)
+[PASS] test_ASFWrongDocumentOrUnsupportedRequiredProfileCannotDeploy() (gas: 405402)
+Suite result: ok. 28 passed; 0 failed; 0 skipped; finished in 187.87ms (380.59ms CPU time)
 
 Ran 1 test for test/Invariants.t.sol:ReservationInvariants
 [PASS] invariant_InventoryReceiptsAndEscrowRemainConserved() (runs: 128, calls: 8192, reverts: 0)
@@ -321,6 +325,6 @@ Ran 1 test for test/Invariants.t.sol:ReservationInvariants
 | LifecycleHandler | release  | 882   | 0       | 0        |
 ╰------------------+----------+-------+---------+----------╯
 
-Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 3.09s (3.08s CPU time)
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 3.11s (3.10s CPU time)
 
-Ran 4 test suites in 3.10s (3.30s CPU time): 55 tests passed, 0 failed, 0 skipped (55 total tests)
+Ran 4 test suites in 3.11s (3.35s CPU time): 59 tests passed, 0 failed, 0 skipped (59 total tests)

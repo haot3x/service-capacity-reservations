@@ -1,7 +1,7 @@
 {
   "asf": "1.0",
   "kind": "profile-descriptor",
-  "identifier": "x:finch:capacity-safety@1",
+  "identifier": "x:finch:capacity-safety@2",
   "family": "governance-accountability",
   "summary": "Gate capacity commitments and provider delivery while preserving independent escrow recovery and settlement rights.",
   "evaluatesOver": [
@@ -18,7 +18,8 @@
         "admit"
       ],
       "settlement": "independent-order-authority",
-      "version": 1
+      "version": 2,
+      "standingStops": "deny-covered-actions"
     }
   },
   "partialOrder": {
@@ -32,7 +33,8 @@
       "inputs": [
         "immutable pool provider and adapter set",
         "pinned ASF binding and ancestor records",
-        "current ASF clause result"
+        "current ASF clause result",
+        "current standing stop of the named guardian"
       ],
       "resultMeaning": "The guarded marketplace enforced the local action policy in this transaction.",
       "trustAssumptions": [
@@ -52,7 +54,8 @@
     "Response documents do not expand the compiled action policy. The version defines the same maximum permitted actions for every responseRef.",
     "The binding can never be replaced on an existing pool.",
     "The fixed guardian and closed resume-holder set are checked independently on every ancestor, not only the leaf.",
-    "A nonzero responseRef on any suspended ancestor closes continuation because this prototype cannot interpret its response document; a zero reference uses only this pinned profile and its bit-set policy."
+    "A nonzero responseRef on any suspended ancestor closes continuation because this prototype cannot interpret its response document; a zero reference uses only this pinned profile and its bit-set policy.",
+    "Any standing stop by the named guardian closes delivery continuation, independently of the first check reason. An unavailable stop query also closes continuation."
   ],
   "limitations": [
     "No proof of capacity outside this pool, actual computation, or report quality.",
