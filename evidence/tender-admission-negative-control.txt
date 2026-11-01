@@ -1,0 +1,23 @@
+Compiling 1 files with Solc 0.8.26
+Solc 0.8.26 finished in 663.43ms
+Compiler run successful with warnings:
+Warning (2072): Unused local variable.
+   --> test/TenderAdmission.t.sol:112:9:
+    |
+112 |         bytes32 requestId = keccak256(
+    |         ^^^^^^^^^^^^^^^^^
+
+
+Ran 1 test for test/TenderAdmission.t.sol:TenderAdmissionTest
+[FAIL: next call did not revert as expected] test_SecondOverlappingTenderFailsBeforeCommitmentIsAccepted() (gas: 156603)
+Suite result: FAILED. 0 passed; 1 failed; 0 skipped; finished in 551.17µs (49.08µs CPU time)
+
+Ran 1 test suite in 4.01ms (551.17µs CPU time): 0 tests passed, 1 failed, 0 skipped (1 total tests)
+
+Failing tests:
+Encountered 1 failing test in test/TenderAdmission.t.sol:TenderAdmissionTest
+[FAIL: next call did not revert as expected] test_SecondOverlappingTenderFailsBeforeCommitmentIsAccepted() (gas: 156603)
+
+Encountered a total of 1 failing tests, 0 tests succeeded
+
+Tip: Run `forge test --rerun` to retry only the 1 failed test
