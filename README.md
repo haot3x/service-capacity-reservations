@@ -10,6 +10,8 @@ Repository: https://github.com/haot3x/service-capacity-reservations
 
 ASF compatibility is pinned to **revision 7**, commit `a76071c0e0ab76c296a0eb878dee1365ce5a78bc`. Standing guardian stops deny covered provider actions, while pre-existing buyer recovery and settlement retain their own authorization. See [the version boundary](./ASF-INTEGRATION.md#version-boundary).
 
+The [tender-admission experiment](./TENDER-ADMISSION.md) adds twelve tests for ERC-8469's separate capacity-extension boundary: reserve before admitting a bid, reject a competing tender early, and preserve the winner's reservation during atomic target binding. It uses the real inventory ledger with test-only award outcomes and target accounting.
+
 ## Run
 
 Prerequisites: Python 3, Node.js/npm and Foundry **v1.7.1**. Solidity **0.8.26** and Cancun are configured in `foundry.toml`; OpenZeppelin Contracts **5.4.0** is pinned in `package-lock.json`.
@@ -33,7 +35,7 @@ Expected demo:
 5. Buyer accepts the six-report order, paying the provider 600 raw token units.
 6. The four-report order times out and refunds its buyer. Consumed quota remains ten.
 
-See [RESULTS.md](./RESULTS.md) for recorded checks and [evidence/local-check.txt](./evidence/local-check.txt) for the run output. The same checks run in [GitHub Actions](https://github.com/haot3x/service-capacity-reservations/actions/workflows/test.yml); see that page for the current remote result. The current run passes **59 tests**, including **28 ASF integration tests**. See [ASF-INTEGRATION.md](./ASF-INTEGRATION.md) for the action matrix, authority boundaries and optional JSON Schema validation command.
+See [RESULTS.md](./RESULTS.md) for recorded checks and [the 1 November run](./evidence/2026-11-01-local-check.txt) for the output. The same checks run in [GitHub Actions](https://github.com/haot3x/service-capacity-reservations/actions/workflows/test.yml); see that page for the current remote result. The current run passes **71 tests**, including **28 ASF integration tests** and **12 tender-admission cases**. See [ASF-INTEGRATION.md](./ASF-INTEGRATION.md) for the action matrix, authority boundaries and optional JSON Schema validation command.
 
 ## Components
 

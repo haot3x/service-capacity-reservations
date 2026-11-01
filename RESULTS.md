@@ -1,9 +1,9 @@
 # Local Prototype Results
 
 Author: Ted (@haot3x)
-Recorded local run: 2026-10-28
+Recorded local run: 2026-11-01
 
-The capacity-reservation baseline and the new ASF consumer integration pass **59 local tests**. The ASF tests run the actual revision-7 reference registries, pinned to commit `a76071c0e0ab76c296a0eb878dee1365ce5a78bc`. This is implementation evidence for a local application profile, not independent interoperability, an audit, or approval of a new ERC.
+The capacity-reservation baseline, ASF consumer integration and test-only tender-admission model pass **71 local tests**. The ASF tests run the actual revision-7 reference registries, pinned to commit `a76071c0e0ab76c296a0eb878dee1365ce5a78bc`. The twelve added admission cases use the real ledger with a modeled award outcome and target. This is local application evidence, not independent interoperability, an audit, or approval of a new ERC.
 
 ## Recorded run
 
@@ -13,23 +13,26 @@ Command: `bash scripts/check.sh`, with `FORGE_BIN` selecting the native Forge ex
 |---|---|
 | Vendored dependency integrity | 16 files match the pinned manifest; also compared byte-for-byte to the upstream checkout |
 | Canonical policy documents | 3 byte representations match readable JSON; parameters/profile references agree |
-| JSON Schema validation, separate recorded command | Specification and profile pass the pinned upstream schemas with jsonschema 4.26.0 |
+| JSON Schema validation, historical separate command (28 October) | Unchanged specification and profile passed the pinned upstream schemas with jsonschema 4.26.0 |
 | Locked npm installation with install scripts disabled | Passed |
 | `forge fmt --check` | Passed; vendored source deliberately excluded |
 | Solidity 0.8.26 build, Cancun, optimizer 200 | Passed |
 | Reservation and signed-hold tests | 30 passed |
 | ASF integration tests | 28 passed |
+| Tender admission cases | 12 passed |
 | Fuzz tests | 256 quantity cases, 256 adopter-suspension cases and 256 standing-stop cases |
 | Stateful inventory/escrow invariant | Passed: 128 sequences, depth 64, 8,192 handler calls |
-| Final total | 59 passed; 0 failed; 0 skipped |
+| Final total | 71 passed; 0 failed; 0 skipped |
 | Fuzz seed | `0x20261026` |
-| Targeted mutation checks | Independent stop-query omission caught by the terminated-sibling regression; source restored and that regression passed |
+| Targeted mutation checks | Omitted admission reserve caught by the competing-tender regression; restored before the full run. The separate ASF stop-query mutation is historical evidence from 28 October. |
 | Forge | 1.7.1, commit `4072e48705af9d93e3c0f6e29e93b5e9a40caed8` |
 | OpenZeppelin Contracts | 5.4.0, locked npm dependency |
 
 Evidence:
 
-- [Full local check](./evidence/local-check.txt)
+- [Full 1 November check](./evidence/2026-11-01-local-check.txt)
+- [Prior 28 October check](./evidence/local-check.txt)
+- [Tender admission negative control](./evidence/tender-admission-negative-control.txt)
 - [Schema validation](./evidence/asf-schema-check.txt)
 - [Revision-7 standing-stop mutation failure](./evidence/asf-stop-mutation-check.txt)
 - [Historical revision-4 mutation failures](./evidence/asf-mutation-check.txt)
@@ -41,6 +44,8 @@ Verify the current snapshot from the project root with `shasum -a 256 -c evidenc
 The invariant handler uses the original direct/signed adapters, not the ASF adapter. It catches expected application reverts and skips inapplicable actions; zero handler reverts does **not** mean all attempted actions succeeded. It checks ledger counters, receipt balances, historical admissions, provider payments and unpaid obligations, followed by deadline recovery to zero unpaid liability. ASF coverage is the separate integration and suspension-mask fuzz suite, not a claim of stateful ASF invariant coverage or exhaustive enumeration of all inputs.
 
 ## Observed demonstrations
+
+The twelve [tender-admission cases](./TENDER-ADMISSION.md) reject a second overlapping commitment before acceptance, retain a winning reservation through target binding, and roll back both target and ledger changes on failure. Losing/void holds are released, live bidder cancellation is refused, and an expired hold cannot execute. Target funding and the final auction outcome are modeled, not independently verified.
 
 The original two-market demonstration still passes: six direct admissions leave four available, a signed request for five fails, four succeed, and all ten are eventually consumed. Buyer acceptance pays 600 raw test-token units for one order; the other times out and refunds without restoring consumed quota.
 
@@ -85,4 +90,4 @@ Forge lint reports timestamp-comparison warnings and the existing intentional te
 - The recorded run above is local. Public source: https://github.com/haot3x/service-capacity-reservations. Remote results are available in GitHub Actions; they are separate from the archived local log. The complete ASF upstream suite was not replayed.
 - Compatibility is limited to the pinned revision-7 commit. Future upstream changes require a new review.
 
-Next: review the tested standing-stop integration with the ASF author, then connect an independently implemented order system before arguing for a new standard.
+Next: rerun the standing-stop regression when the ASF author's union fix lands, and replace the tender outcome/target harnesses with independently implemented contracts before claiming interoperability.
