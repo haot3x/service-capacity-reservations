@@ -41,3 +41,5 @@ A negative control removes the reserve call from admission. The second-tender te
 - A real integration must authenticate the award outcome and target state, align bid/reveal/execution deadlines with the hold lifetime, and define failure/refund remedies. The fixture rejects execution once the hold deadline arrives; it does not promise an award can execute indefinitely.
 
 The next integration step is to replace the outcome and target harnesses with independently implemented contracts. This evidence supports an admission/reservation extension boundary, not a new `integrationProfile` value or an implemented ERC-8469 extension.
+
+The subsequent [real tender integration](./REAL-TENDER-INTEGRATION.md) tests actual upstream auction finalization and real token funding. This earlier model remains for its isolated fault-injection cases.

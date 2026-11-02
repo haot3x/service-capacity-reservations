@@ -1,0 +1,17 @@
+Compiling 2 files with Solc 0.8.26
+Solc 0.8.26 finished in 996.11ms
+Compiler run successful!
+
+Ran 1 test for test/RealTenderCapacity.t.sol:RealTenderCapacityTest
+[FAIL: next call did not revert as expected] test_SecondTenderCannotCommitSameCapacity() (gas: 1177024)
+Suite result: FAILED. 0 passed; 1 failed; 0 skipped; finished in 975.96µs (195.96µs CPU time)
+
+Ran 1 test suite in 3.66ms (975.96µs CPU time): 0 tests passed, 1 failed, 0 skipped (1 total tests)
+
+Failing tests:
+Encountered 1 failing test in test/RealTenderCapacity.t.sol:RealTenderCapacityTest
+[FAIL: next call did not revert as expected] test_SecondTenderCannotCommitSameCapacity() (gas: 1177024)
+
+Encountered a total of 1 failing tests, 0 tests succeeded
+
+Tip: Run `forge test --rerun` to retry only the 1 failed test

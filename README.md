@@ -12,6 +12,8 @@ ASF compatibility is pinned to **revision 8**, commit `d0f2de7207f63fa1bbcc0fd5f
 
 The [tender-admission experiment](./TENDER-ADMISSION.md) adds twelve tests for ERC-8469's separate capacity-extension boundary: reserve before admitting a bid, reject a competing tender early, and preserve the winner's reservation during atomic target binding. It uses the real inventory ledger with test-only award outcomes and target accounting.
 
+The [real tender integration](./REAL-TENDER-INTEGRATION.md) now adds twelve cases using the pinned upstream ERC-8469 auction, actual capacity and actual booking escrow. It is allocation-only with a fixed posted price; the complete suite passes **85 tests**.
+
 ## Run
 
 Prerequisites: Python 3, Node.js/npm and Foundry **v1.7.1**. Solidity **0.8.26** and Cancun are configured in `foundry.toml`; OpenZeppelin Contracts **5.4.0** is pinned in `package-lock.json`.
@@ -22,7 +24,7 @@ bash scripts/demo.sh
 bash scripts/demo-asf.sh
 ```
 
-`check.sh` verifies the pinned ASF dependency and canonical policy documents, installs the locked npm dependency with install scripts disabled, checks formatting, builds production contracts, and runs all tests with seed `0x20261026`. `demo.sh` runs the two-market scenario and `demo-asf.sh` runs suspension/recovery after dependencies are installed. To select a native Forge executable outside `PATH`, set `FORGE_BIN=/absolute/path/to/forge`.
+`check.sh` verifies the pinned ASF and ERC-8469 dependencies and canonical policy documents, installs the locked npm dependency with install scripts disabled, checks formatting, builds production contracts, and runs all tests with seed `0x20261026`. `demo.sh` runs the two-market scenario and `demo-asf.sh` runs suspension/recovery after dependencies are installed. To select a native Forge executable outside `PATH`, set `FORGE_BIN=/absolute/path/to/forge`.
 
 The demo is a local EVM test. It uses no wallet key, RPC endpoint, real service, or real payment asset. Its synthetic timestamps and raw test-token amounts are not a live commercial offer.
 
@@ -35,7 +37,7 @@ Expected demo:
 5. Buyer accepts the six-report order, paying the provider 600 raw token units.
 6. The four-report order times out and refunds its buyer. Consumed quota remains ten.
 
-See [RESULTS.md](./RESULTS.md) for recorded checks and [the 2 November run](./evidence/2026-11-02-asf-v8-check.txt) for the output. The same checks run in [GitHub Actions](https://github.com/haot3x/service-capacity-reservations/actions/workflows/test.yml); see that page for the current remote result. The current run passes **73 tests**, including **30 ASF integration tests** and **12 tender-admission cases**. See [ASF-INTEGRATION.md](./ASF-INTEGRATION.md) for the action matrix, authority boundaries and optional JSON Schema validation command.
+See [RESULTS.md](./RESULTS.md) for recorded checks and [the 2 November run](./evidence/2026-11-02-real-tender-check.txt) for the output. The same checks run in [GitHub Actions](https://github.com/haot3x/service-capacity-reservations/actions/workflows/test.yml); see that page for the current remote result. The current run passes **73 tests**, including **30 ASF integration tests** and **12 tender-admission cases**. See [ASF-INTEGRATION.md](./ASF-INTEGRATION.md) for the action matrix, authority boundaries and optional JSON Schema validation command.
 
 ## Components
 
