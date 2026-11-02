@@ -1,0 +1,17 @@
+Compiling 5 files with Solc 0.8.26
+Solc 0.8.26 finished in 1.56s
+Compiler run successful!
+
+Ran 1 test for test/ASFCapacity.t.sol:ASFCapacityTest
+[FAIL: next call did not revert as expected] test_ASFStandingEssentialStopStillClosesNarrowContinuation() (gas: 2355464)
+Suite result: FAILED. 0 passed; 1 failed; 0 skipped; finished in 3.11ms (1.67ms CPU time)
+
+Ran 1 test suite in 3.77ms (3.11ms CPU time): 0 tests passed, 1 failed, 0 skipped (1 total tests)
+
+Failing tests:
+Encountered 1 failing test in test/ASFCapacity.t.sol:ASFCapacityTest
+[FAIL: next call did not revert as expected] test_ASFStandingEssentialStopStillClosesNarrowContinuation() (gas: 2355464)
+
+Encountered a total of 1 failing tests, 0 tests succeeded
+
+Tip: Run `forge test --rerun` to retry only the 1 failed test
