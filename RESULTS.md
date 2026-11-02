@@ -1,9 +1,9 @@
 # Local Prototype Results
 
 Author: Ted (@haot3x)
-Recorded local run: 2026-11-01
+Recorded local run: 2026-11-02
 
-The capacity-reservation baseline, ASF consumer integration and test-only tender-admission model pass **71 local tests**. The ASF tests run the actual revision-7 reference registries, pinned to commit `a76071c0e0ab76c296a0eb878dee1365ce5a78bc`. The twelve added admission cases use the real ledger with a modeled award outcome and target. This is local application evidence, not independent interoperability, an audit, or approval of a new ERC.
+The capacity-reservation baseline, ASF consumer integration and test-only tender-admission model pass **73 local tests**. The ASF tests run the actual revision-8 reference registries, pinned to commit `d0f2de7207f63fa1bbcc0fd5fddd45f92be4b097`. The twelve added admission cases use the real ledger with a modeled award outcome and target. This is local application evidence, not independent interoperability, an audit, or approval of a new ERC.
 
 ## Recorded run
 
@@ -13,28 +13,31 @@ Command: `bash scripts/check.sh`, with `FORGE_BIN` selecting the native Forge ex
 |---|---|
 | Vendored dependency integrity | 16 files match the pinned manifest; also compared byte-for-byte to the upstream checkout |
 | Canonical policy documents | 3 byte representations match readable JSON; parameters/profile references agree |
-| JSON Schema validation, historical separate command (28 October) | Unchanged specification and profile passed the pinned upstream schemas with jsonschema 4.26.0 |
+| JSON Schema validation (2 November) | Specification and profile passed the revision-8 upstream schemas with jsonschema 4.26.0 |
 | Locked npm installation with install scripts disabled | Passed |
 | `forge fmt --check` | Passed; vendored source deliberately excluded |
 | Solidity 0.8.26 build, Cancun, optimizer 200 | Passed |
 | Reservation and signed-hold tests | 30 passed |
-| ASF integration tests | 28 passed |
+| ASF integration tests | 30 passed |
 | Tender admission cases | 12 passed |
 | Fuzz tests | 256 quantity cases, 256 adopter-suspension cases and 256 standing-stop cases |
 | Stateful inventory/escrow invariant | Passed: 128 sequences, depth 64, 8,192 handler calls |
-| Final total | 71 passed; 0 failed; 0 skipped |
+| Final total | 73 passed; 0 failed; 0 skipped |
 | Fuzz seed | `0x20261026` |
-| Targeted mutation checks | Omitted admission reserve caught by the competing-tender regression; restored before the full run. The separate ASF stop-query mutation is historical evidence from 28 October. |
+| Targeted mutation checks | Restoring the old evaluator fails the union case; removing the strict guardian check fails essential-only continuation. Both restored before the full run. The admission-reserve negative control is from 1 November. |
 | Forge | 1.7.1, commit `4072e48705af9d93e3c0f6e29e93b5e9a40caed8` |
 | OpenZeppelin Contracts | 5.4.0, locked npm dependency |
 
 Evidence:
 
-- [Full 1 November check](./evidence/2026-11-01-local-check.txt)
+- [Full 2 November check](./evidence/2026-11-02-asf-v8-check.txt)
+- [Old evaluator negative control](./evidence/asf-v8-old-evaluator-negative-control.txt)
+- [Strict policy negative control](./evidence/asf-v8-strict-policy-negative-control.txt)
+- [Prior 1 November check](./evidence/2026-11-01-local-check.txt)
 - [Prior 28 October check](./evidence/local-check.txt)
 - [Tender admission negative control](./evidence/tender-admission-negative-control.txt)
-- [Schema validation](./evidence/asf-schema-check.txt)
-- [Revision-7 standing-stop mutation failure](./evidence/asf-stop-mutation-check.txt)
+- [Revision-8 schema validation](./evidence/asf-v8-schema-check.txt)
+- [Historical revision-7 standing-stop mutation failure](./evidence/asf-stop-mutation-check.txt)
 - [Historical revision-4 mutation failures](./evidence/asf-mutation-check.txt)
 - [Current source and evidence SHA-256 manifest](./evidence/SHA256SUMS)
 - [Historical 2026-10-23 baseline output](./evidence/2026-10-23-baseline/local-check.txt)
@@ -62,7 +65,7 @@ The ASF demonstration observes:
 
 The action policy and its explicit escrow scope are in [ASF-INTEGRATION.md](./ASF-INTEGRATION.md). The guardian cannot accept an order on the buyer's behalf.
 
-The revision-7 mutation removes `_standingStopAbsent` from the continuation condition. A guardian stops an independent sibling, that sibling is terminated, and the provider self-suspends the pinned leaf with `ESSENTIAL_ONLY`. The registry reports `Suspended` first with flags 4, while the full standing stop survives. Without the consumer's separate query, submission succeeds and the regression fails. Restoring the guard makes the same test pass. This is a consumer-policy regression, not a claimed upstream defect.
+The revision-8 terminated-sibling case now observes flags 20 (`FULL_STOP | ESSENTIAL_ONLY`) with reason `Suspended`. Restoring the old evaluator returns 4 and fails that assertion. A separate test sets both the standing stop and self-suspension to `ESSENTIAL_ONLY`: removing our independent `stopOf` check then permits delivery and fails the strict-policy regression. The ancestor union test also checks an empty set after the chain terminates. Buyer recovery and settlement tests remain passing.
 
 The earlier revision-4 mutation log is retained as historical evidence for payment callback and ancestor resume-holder checks. Those two mutations were not rerun in this revision.
 
@@ -88,6 +91,6 @@ Forge lint reports timestamp-comparison warnings and the existing intentional te
 - No implementation of ERC-5006/non-token alternatives or ERC-8183/8414/8448 order integrations.
 - Free repeated holds still have no anti-squatting policy.
 - The recorded run above is local. Public source: https://github.com/haot3x/service-capacity-reservations. Remote results are available in GitHub Actions; they are separate from the archived local log. The complete ASF upstream suite was not replayed.
-- Compatibility is limited to the pinned revision-7 commit. Future upstream changes require a new review.
+- Compatibility is limited to the pinned revision-8 commit. Future upstream changes require a new review.
 
-Next: rerun the standing-stop regression when the ASF author's union fix lands, and replace the tender outcome/target harnesses with independently implemented contracts before claiming interoperability.
+Next: replace the tender outcome/target harnesses with independently implemented contracts before claiming interoperability. The revision-8 dependency port is complete; this does not replay the entire upstream suite or its deployment script.

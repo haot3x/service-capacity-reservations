@@ -12,7 +12,7 @@ import {IASFSpecificationRegistry} from "../../vendor/asf/interfaces/IASFSpecifi
 import {CapacitySafetyPolicy as Policy} from "./CapacitySafetyPolicy.sol";
 
 /// @author Ted (@haot3x)
-/// @notice Local consumer of pinned ASF revision 7. Provider suspension covers commitments and delivery;
+/// @notice Local consumer of pinned ASF revision 8. Provider suspension covers commitments and delivery;
 ///         established escrow recovery and settlement have a separate, pre-accepted authority.
 contract ASFCapacityMarket is DirectBookingMarket {
     IASFBindingRegistry public immutable safetyRegistry;
@@ -132,8 +132,8 @@ contract ASFCapacityMarket is DirectBookingMarket {
         revert SafetyDenied(verdict, reason, restrictions);
     }
 
-    /// @dev A Suspended leaf is evaluated before standing stops in revision 7. Check the stop independently
-    ///      before granting our optional continuation; the first failure reason alone cannot authorize it.
+    /// @dev Revision 8 includes named stops in the returned union. This separate query preserves our
+    ///      stricter profile: even an ESSENTIAL_ONLY guardian stop closes optional continuation.
     function _standingStopAbsent(uint256 poolId) private view returns (bool) {
         address provider = registry.getPool(poolId).provider;
         try safetyRegistry.stopOf(

@@ -288,7 +288,7 @@ contract ASFCapacityTest is TestSupport {
         _selfPause(leaf, T.RESTRICT_ESSENTIAL_ONLY);
         (, T.Reason reason, uint8 flags) = market.safetyState(pool);
         eq(uint256(reason), uint256(T.Reason.Suspended));
-        eq(flags, T.RESTRICT_ESSENTIAL_ONLY);
+        eq(flags, T.RESTRICT_ESSENTIAL_ONLY | T.RESTRICT_FULL_STOP);
         yes(_stop().bindingId == sibling);
         vm.prank(PROVIDER);
         vm.expectPartialRevert(ASFCapacityMarket.SafetyDenied.selector);
@@ -308,6 +308,52 @@ contract ASFCapacityTest is TestSupport {
         vm.prank(PROVIDER);
         market.submit(id, keccak256("report"));
         _sums();
+    }
+
+    function test_ASFStandingEssentialStopStillClosesNarrowContinuation() public {
+        uint256 id = _book();
+        vm.warp(START);
+        _admit(id);
+        T.BindingInput memory input = _input(pool, bytes32(0), keccak256("essential sibling"));
+        vm.prank(PROVIDER);
+        bytes32 sibling = safety.adopt(input);
+        _pause(sibling, T.RESTRICT_ESSENTIAL_ONLY);
+        vm.prank(PROVIDER);
+        safety.terminate(sibling, bytes32(0));
+        _selfPause(leaf, T.RESTRICT_ESSENTIAL_ONLY);
+        (, T.Reason reason, uint8 flags) = market.safetyState(pool);
+        eq(uint256(reason), uint256(T.Reason.Suspended));
+        eq(flags, T.RESTRICT_ESSENTIAL_ONLY);
+        // The union is a known continuation set, but our profile denies every guardian stop.
+        vm.prank(PROVIDER);
+        vm.expectPartialRevert(ASFCapacityMarket.SafetyDenied.selector);
+        market.submit(id, keccak256("report"));
+        _liftStop(guardian);
+        vm.prank(PROVIDER);
+        market.submit(id, keccak256("report"));
+        _sums();
+    }
+
+    function test_ASFNamedStopAndAncestorSetsAreBothReturned() public {
+        T.BindingInput memory input = _input(pool, bytes32(0), keccak256("union sibling"));
+        vm.prank(PROVIDER);
+        bytes32 sibling = safety.adopt(input);
+        _pause(sibling, T.RESTRICT_FULL_STOP);
+        vm.prank(PROVIDER);
+        safety.terminate(sibling, bytes32(0));
+        _selfPause(root, T.RESTRICT_ESSENTIAL_ONLY);
+        T.RequirementSet memory req = market.requirement(pool);
+        (T.Verdict verdict, T.Reason reason, uint8 flags) = safety.checkBinding(leaf, req.clauses[0]);
+        eq(uint256(verdict), uint256(T.Verdict.NotSatisfied));
+        eq(uint256(reason), uint256(T.Reason.StoppedByIntervener));
+        eq(flags, T.RESTRICT_FULL_STOP | T.RESTRICT_ESSENTIAL_ONLY);
+        (,, uint8 aggregateFlags) = market.safetyState(pool);
+        eq(aggregateFlags, flags);
+        vm.prank(PROVIDER);
+        safety.terminate(root, bytes32(0));
+        (,, flags) = safety.checkBinding(leaf, req.clauses[0]);
+        eq(flags, 0); // A dead chain has no continuation set, even while its named stop stands.
+        yes(_stop().bindingId == sibling);
     }
 
     function test_ASFFreshBindingRemainsStoppedAfterOriginalTermination() public {
