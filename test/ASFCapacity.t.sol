@@ -684,6 +684,101 @@ contract ASFCapacityTest is TestSupport {
         _sums();
     }
 
+    function test_ASFRev9AtomicEscalationClosesContinuationAndResumeRestoresIt() public {
+        uint256 completed = _book();
+        uint256 pending = _book();
+        vm.warp(START);
+        _admit(completed);
+        _admit(pending);
+        _selfPause(leaf, T.RESTRICT_ESSENTIAL_ONLY);
+        vm.prank(PROVIDER);
+        market.submit(completed, keccak256("permitted continuation"));
+
+        // No intervening resume transaction: revision 8 reverts on this call.
+        _pause(leaf, T.RESTRICT_FULL_STOP);
+        (,, uint8 flags) = market.safetyState(pool);
+        eq(flags, T.RESTRICT_ESSENTIAL_ONLY | T.RESTRICT_FULL_STOP);
+        yes(_stop().bindingId == leaf);
+        vm.prank(PROVIDER);
+        vm.expectPartialRevert(ASFCapacityMarket.SafetyDenied.selector);
+        market.submit(pending, keccak256("must wait"));
+        eq(uint256(market.getOrder(pending).status), uint256(MarketEscrow.OrderStatus.Admitted));
+
+        // The guardian cannot rewrite acceptance rights for an existing result.
+        vm.prank(BUYER);
+        market.accept(completed);
+        eq(token.balanceOf(PROVIDER), 100);
+        _resume(leaf);
+        yes(_stop().bindingId == bytes32(0));
+        vm.prank(PROVIDER);
+        market.submit(pending, keccak256("after recovery"));
+        eq(capacity.getPool(pool).consumed, 2);
+        _sums();
+    }
+
+    function test_ASFRev9EscalationPreservesCancellationAndDeadlineRefund() public {
+        uint256 cancelId = _book();
+        uint256 workId = _book();
+        _selfPause(root, T.RESTRICT_ESSENTIAL_ONLY);
+        _pause(root, T.RESTRICT_FULL_STOP);
+        vm.prank(BUYER);
+        market.cancel(cancelId); // the original pre-window cancellation rule still applies
+        _resume(root);
+        vm.warp(START);
+        _admit(workId);
+        _selfPause(root, T.RESTRICT_ESSENTIAL_ONLY);
+        _pause(root, T.RESTRICT_FULL_STOP);
+        vm.prank(PROVIDER);
+        vm.expectPartialRevert(ASFCapacityMarket.SafetyDenied.selector);
+        market.submit(workId, keccak256("stopped"));
+        vm.expectRevert(MarketEscrow.RefundUnavailable.selector);
+        market.claimRefund(workId);
+        vm.warp(DEADLINE);
+        market.claimRefund(workId);
+        eq(token.balanceOf(BUYER), 100_000);
+        eq(token.balanceOf(PROVIDER), 0);
+        // Refunding already-admitted work never recreates capacity.
+        eq(capacity.getPool(pool).consumed, 1);
+        _status(workId, CapacityReservations.Status.Consumed);
+        _sums();
+    }
+
+    function test_ASFRev9OtherSuspenderCannotPreemptNamedGuardian() public {
+        address other = address(0x0A11);
+        address[] memory adapters = new address[](1);
+        adapters[0] = address(market);
+        pool = _pool(adapters);
+        T.BindingInput memory i = _input(pool, bytes32(0), keccak256("two interveners"));
+        i.interveners = new T.Intervener[](2);
+        i.interveners[0] = T.Intervener(guardian, T.RIGHT_ALL);
+        i.interveners[1] = T.Intervener(other, T.RIGHT_SUSPEND);
+        vm.prank(PROVIDER);
+        leaf = safety.adopt(i);
+        vm.prank(PROVIDER);
+        market.configureSafety(pool, leaf);
+        uint256 id = _book();
+        vm.warp(START);
+        _admit(id);
+        vm.prank(other);
+        safety.suspend(leaf, T.RESTRICT_ESSENTIAL_ONLY, bytes32(0), bytes32(0));
+        _pause(leaf, T.RESTRICT_FULL_STOP);
+        vm.prank(PROVIDER);
+        vm.expectPartialRevert(ASFCapacityMarket.SafetyDenied.selector);
+        market.submit(id, keccak256("stopped"));
+
+        // The record keeps the first intervener. Resuming it does not lift the
+        // named guardian's own stop: the consumer must still refuse submission.
+        _resume(leaf);
+        yes(_stop().bindingId == leaf);
+        vm.prank(PROVIDER);
+        vm.expectPartialRevert(ASFCapacityMarket.SafetyDenied.selector);
+        market.submit(id, keccak256("still stopped"));
+        _liftStop(guardian);
+        vm.prank(PROVIDER);
+        market.submit(id, keccak256("named guardian released"));
+        _sums();
+    }
+
     function testDemo_ASFSuspensionKeepsRefundAndExplicitContinuationDistinct() public {
         uint256 cancelId = _book();
         uint256 workId = _book();

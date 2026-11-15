@@ -1,17 +1,19 @@
 # ASF and Service Capacity Reservations
 
 Author: Ted (@haot3x)
-Date: 2026-11-02
+Date: 2026-11-15
 
 The local capacity prototype now has an optional ASF-guarded market. It uses the actual pinned ASF specification and binding registries to gate new commitments and result submission. Existing refund and settlement rights remain governed by the original order. This is a consumer integration experiment, not a new ERC or a claim that ASF has reached Final status.
 
 ## Version boundary
 
-This snapshot pins revision 8 at commit `d0f2de7207f63fa1bbcc0fd5fddd45f92be4b097`. The compiled binding-registry interface ID is `0xcff7f826`, checked against the actual registry in the integration suite. No Sepolia deployment is claimed here.
+This snapshot pins revision 9 at commit `71dac3de79f9b0cc98e0fa6484870da4f290fb89`. The compiled binding-registry interface ID is `0xcff7f826`, checked against the actual registry in the integration suite. No Sepolia deployment is claimed here.
 
 Gary confirmed the separation of provider safety controls and pre-existing buyer escrow rights in [the discussion](https://ethereum-magicians.org/t/erc-8468-agent-safety-framework-asf/30073/15).
 
-The local profile advances to `x:finch:capacity-safety@2`, with new canonical specification and parameter commitments. Any standing stop by the named guardian closes our optional delivery continuation, including an essential-only stop. `StoppedByIntervener` is never an accepted continuation reason. Revision 8 returns the union of named standing stops and suspended-chain restrictions even when the first reason is `Suspended`. The consumer still queries `stopOf` independently: an essential-only guardian stop has the same bit set as a permitted self-suspension, but our profile intentionally refuses the former. A stop-query failure denies continuation. No policy hashes or permissions change in this dependency upgrade.
+The local profile remains `x:finch:capacity-safety@2`, with new canonical specification and parameter commitments. Any standing stop by the named guardian closes our optional delivery continuation, including an essential-only stop. `StoppedByIntervener` is never an accepted continuation reason. Revision 8 returns the union of named standing stops and suspended-chain restrictions even when the first reason is `Suspended`. The consumer still queries `stopOf` independently: an essential-only guardian stop has the same bit set as a permitted self-suspension, but our profile intentionally refuses the former. A stop-query failure denies continuation. No policy hashes or permissions change in this dependency upgrade.
+
+Revision 9 permits an intervener to widen an already-suspended record in one transaction. The capacity tests cover a provider's essential-only self-suspension followed by the guardian's full stop, without a temporary resume. They also check that escalation preserves buyer acceptance, cancellation and deadline refunds, and that another intervener's earlier suspension cannot prevent the named guardian from recording its own stop. Our profile still requires the named guardian to hold both suspend and resume rights; this is a consumer test of atomic escalation, not the upstream suspend-only configuration.
 
 ## What is connected
 
@@ -21,7 +23,7 @@ The consumer fixes specification version 1, its canonical document hash, the req
 
 The authority reference is checked against the actual pool provider, chain, registry and pool ID. It is not accepted as a self-authenticating claim. The scope also includes the market address. Only the trusted, pinned reference registries are supported by this experiment; the consumer does not authenticate arbitrary registry implementations merely because they expose the same interface.
 
-Source: https://github.com/garyyang-finchip/agent-safety-framework/tree/d0f2de7207f63fa1bbcc0fd5fddd45f92be4b097
+Source: https://github.com/garyyang-finchip/agent-safety-framework/tree/71dac3de79f9b0cc98e0fa6484870da4f290fb89
 
 Discussion: https://ethereum-magicians.org/t/30073
 
@@ -67,9 +69,11 @@ uv run --with jsonschema==4.26.0 python scripts/validate-asf-documents.py
 
 The first command needs Python 3, Node/npm and native Foundry 1.7.1. `FORGE_BIN` can select the Forge executable. The last command additionally uses `uv` to run the pinned JSON Schema validator; all schema references resolve to the vendored local schemas. Dependency provenance and integrity checks are described in [vendor/asf/README.md](./vendor/asf/README.md).
 
-The 30 ASF integration tests include two 256-run fuzz tests over adopter suspension masks and standing guardian stop masks; fresh bindings after termination; a suspended leaf masking a terminated sibling's standing stop; named-lifter recovery; unavailable stop queries; parent/leaf unions; exact expiry; termination; unsupported profiles; authority mismatches; immutable binding selection; parent resume-holder closure; unknown/reverting/malformed checks; response-document refusal; callback-triggered suspension; cancellation; third-party recovery; and buyer-only settlement. The real ASF registries execute the normal lifecycle. Explicit mocks are used to inject unavailable or malformed registry responses; the payment asset is a local test token.
+The 33 ASF integration tests include two 256-run fuzz tests over adopter suspension masks and standing guardian stop masks; fresh bindings after termination; a suspended leaf masking a terminated sibling's standing stop; named-lifter recovery; unavailable stop queries; parent/leaf unions; exact expiry; termination; unsupported profiles; authority mismatches; immutable binding selection; parent resume-holder closure; unknown/reverting/malformed checks; response-document refusal; callback-triggered suspension; cancellation; third-party recovery; and buyer-only settlement. The real ASF registries execute the normal lifecycle. Explicit mocks are used to inject unavailable or malformed registry responses; the payment asset is a local test token.
 
-Two negative controls separate the upstream fix from our stricter policy: restoring the revision-7 evaluator fails the terminated-sibling union assertion, while removing our independent stop check fails the essential-only guardian-stop case. Both are restored before the full run. A further case checks the ancestor/stop union and an empty continuation set after ancestor termination. Historical revision-4 mutation checks were not rerun.
+Historical revision-8 negative controls separate the upstream fix from our stricter policy: restoring the revision-7 evaluator fails the terminated-sibling union assertion, while removing our independent stop check fails the essential-only guardian-stop case. Both were restored before that run. A further case checks the ancestor/stop union and an empty continuation set after ancestor termination. Historical revision-4 mutation checks were not rerun.
+
+For revision 9, restoring only the revision-8 lifecycle makes all three new integration cases fail with `InvalidState()`. Restoring the pinned revision-9 file passes all 88 tests. The earlier evaluator and strict-policy mutations were not rerun. See [the negative control](./evidence/asf-v9-old-lifecycle-negative-control.txt) and [the complete current run](./evidence/2026-11-15-asf-v9-check.txt).
 
 ## What this proves, and what remains
 
@@ -77,4 +81,4 @@ This is evidence that a concrete service-capacity consumer can distinguish stopp
 
 There is no deployment, real payment, external audit, independently implemented order adapter, or execution of ASF's full upstream suite. The existing stateful inventory/escrow invariant uses the original adapters; ASF coverage consists of the separate integration and flags-fuzz tests. Recorded results and build sizes are in [RESULTS.md](./RESULTS.md).
 
-The code is published at https://github.com/haot3x/service-capacity-reservations. The revision-8 fixture makes the confirmed buyer-rights boundary executable. The upstream union now carries the full-stop restriction in one check; our independent query remains an explicit policy choice for narrower guardian stops. See [Gary's revision-8 update](https://ethereum-magicians.org/t/erc-8468-agent-safety-framework-asf/30073/22).
+The code is published at https://github.com/haot3x/service-capacity-reservations. The revision-9 fixture adds atomic escalation while retaining the confirmed buyer-rights boundary. The upstream union now carries the full-stop restriction in one check; our independent query remains an explicit policy choice for narrower guardian stops. See [Gary's revision-8 update](https://ethereum-magicians.org/t/erc-8468-agent-safety-framework-asf/30073/22).

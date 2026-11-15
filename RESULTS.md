@@ -1,9 +1,9 @@
 # Local Prototype Results
 
 Author: Ted (@haot3x)
-Recorded local run: 2026-11-02
+Recorded local run: 2026-11-15
 
-The capacity-reservation baseline, ASF consumer integration and test-only tender-admission model plus the actual ERC-8469 auction integration pass **85 local tests**. The ASF tests run the actual revision-8 reference registries, pinned to commit `d0f2de7207f63fa1bbcc0fd5fddd45f92be4b097`. The twelve added admission cases use the real ledger with a modeled award outcome and target. This is local application evidence, not independent interoperability, an audit, or approval of a new ERC.
+The capacity-reservation baseline, ASF consumer integration and test-only tender-admission model plus the actual ERC-8469 auction integration pass **88 local tests**. The ASF tests run the actual revision-9 reference registries, pinned to commit `71dac3de79f9b0cc98e0fa6484870da4f290fb89`. The twelve added admission cases use the real ledger with a modeled award outcome and target. This is local application evidence, not independent interoperability, an audit, or approval of a new ERC.
 
 ## Recorded run
 
@@ -18,18 +18,21 @@ Command: `bash scripts/check.sh`, with `FORGE_BIN` selecting the native Forge ex
 | `forge fmt --check` | Passed; vendored source deliberately excluded |
 | Solidity 0.8.26 build, Cancun, optimizer 200 | Passed |
 | Reservation and signed-hold tests | 30 passed |
-| ASF integration tests | 30 passed |
+| ASF integration tests | 33 passed |
 | Tender admission cases | 12 passed |
 | Fuzz tests | 256 quantity cases, 256 adopter-suspension cases and 256 standing-stop cases |
 | Stateful inventory/escrow invariant | Passed: 128 sequences, depth 64, 8,192 handler calls |
 | Real auction + inventory + escrow integration | 12 passed |
-| Final total | 85 passed; 0 failed; 0 skipped |
+| Final total | 88 passed; 0 failed; 0 skipped |
 | Fuzz seed | `0x20261026` |
-| Targeted mutation checks | Restoring the old evaluator fails the union case; removing the strict guardian check fails essential-only continuation. Both restored before the full run. The admission-reserve negative control is from 1 November. |
+| Targeted mutation checks | Restoring only the revision-8 lifecycle fails all three new atomic-escalation cases with `InvalidState()`. The revision-9 source was restored before the full run. Earlier mutation logs are historical, not rerun. |
 | Forge | 1.7.1, commit `4072e48705af9d93e3c0f6e29e93b5e9a40caed8` |
 | OpenZeppelin Contracts | 5.4.0, locked npm dependency |
 
 Evidence:
+
+- [Full 15 November revision-9 check](./evidence/2026-11-15-asf-v9-check.txt)
+- [Revision-8 lifecycle negative control](./evidence/asf-v9-old-lifecycle-negative-control.txt)
 
 - [Real tender full check](./evidence/2026-11-02-real-tender-check.txt)
 - [Real tender admission bypass negative control](./evidence/real-tender-negative-control.txt)
@@ -69,9 +72,11 @@ The ASF demonstration observes:
 
 The action policy and its explicit escrow scope are in [ASF-INTEGRATION.md](./ASF-INTEGRATION.md). The guardian cannot accept an order on the buyer's behalf.
 
-The revision-8 terminated-sibling case now observes flags 20 (`FULL_STOP | ESSENTIAL_ONLY`) with reason `Suspended`. Restoring the old evaluator returns 4 and fails that assertion. A separate test sets both the standing stop and self-suspension to `ESSENTIAL_ONLY`: removing our independent `stopOf` check then permits delivery and fails the strict-policy regression. The ancestor union test also checks an empty set after the chain terminates. Buyer recovery and settlement tests remain passing.
+The retained revision-8 terminated-sibling case observes flags 20 (`FULL_STOP | ESSENTIAL_ONLY`) with reason `Suspended`. Restoring the old evaluator returns 4 and fails that assertion. A separate test sets both the standing stop and self-suspension to `ESSENTIAL_ONLY`: removing our independent `stopOf` check then permits delivery and fails the strict-policy regression. The ancestor union test also checks an empty set after the chain terminates. Buyer recovery and settlement tests remain passing.
 
 The earlier revision-4 mutation log is retained as historical evidence for payment callback and ancestor resume-holder checks. Those two mutations were not rerun in this revision.
+
+The three new revision-9 cases cover escalation without a resume gap, original buyer recovery deadlines, and a named guardian's standing stop surviving the resume of a record first suspended by another intervener. The last case requires the named guardian to lift its own stop before submission resumes. All three fail at escalation when only the old lifecycle file is restored. The upstream report and fix are credited to it44 and Gary; these are additional capacity-consumer regressions.
 
 ## Build observations
 
@@ -95,6 +100,6 @@ Forge lint reports timestamp-comparison warnings and the existing intentional te
 - No implementation of ERC-5006/non-token alternatives or ERC-8183/8414/8448 order integrations.
 - Free repeated holds still have no anti-squatting policy.
 - The recorded run above is local. Public source: https://github.com/haot3x/service-capacity-reservations. Remote results are available in GitHub Actions; they are separate from the archived local log. The complete ASF upstream suite was not replayed.
-- Compatibility is limited to the pinned revision-8 commit. Future upstream changes require a new review.
+- Compatibility is limited to the pinned revision-9 commit. Future upstream changes require a new review.
 
-The new [real tender integration](./REAL-TENDER-INTEGRATION.md) runs the independently authored auction with our actual booking escrow. The earlier harness remains a separate test model; the actual booking escrow is still our implementation. Next: review this allocation-only composition with the auction author. The revision-8 dependency port is complete; this does not replay the entire upstream suite or its deployment script.
+The new [real tender integration](./REAL-TENDER-INTEGRATION.md) runs the independently authored auction with our actual booking escrow. The earlier harness remains a separate test model; the actual booking escrow is still our implementation. Next: review this allocation-only composition with the auction author. The revision-9 dependency port is complete; this does not replay the entire upstream suite or its deployment script.
