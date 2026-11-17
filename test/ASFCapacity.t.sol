@@ -779,6 +779,109 @@ contract ASFCapacityTest is TestSupport {
         _sums();
     }
 
+    function test_ASFRev10StopThroughTerminatedSiblingBlocksDeliveryButKeepsRefund() public {
+        uint256 id = _book();
+        vm.warp(START);
+        _admit(id);
+        T.BindingInput memory i = _input(pool, bytes32(0), keccak256("terminated before stop"));
+        vm.prank(PROVIDER);
+        bytes32 sibling = safety.adopt(i);
+        vm.prank(PROVIDER);
+        safety.terminate(sibling, bytes32(0));
+        bytes32 terminalRecord = keccak256(abi.encode(safety.bindingOf(sibling)));
+        vm.warp(START + 1);
+        _pause(sibling, T.RESTRICT_FULL_STOP);
+        // Recording the standing stop must not revive or rewrite the terminal record.
+        yes(keccak256(abi.encode(safety.bindingOf(sibling))) == terminalRecord);
+        yes(_stop().bindingId == sibling);
+        _selfPause(leaf, T.RESTRICT_ESSENTIAL_ONLY);
+        (,, uint8 flags) = market.safetyState(pool);
+        eq(flags, T.RESTRICT_ESSENTIAL_ONLY | T.RESTRICT_FULL_STOP);
+        vm.prank(PROVIDER);
+        vm.expectPartialRevert(ASFCapacityMarket.SafetyDenied.selector);
+        market.submit(id, keccak256("stopped via terminal sibling"));
+
+        i.salt = keccak256("fresh after stop");
+        vm.prank(PROVIDER);
+        bytes32 fresh = safety.adopt(i);
+        T.RequirementSet memory req = market.requirement(pool);
+        (T.Verdict verdict, T.Reason reason,) = safety.checkBinding(fresh, req.clauses[0]);
+        eq(uint256(verdict), uint256(T.Verdict.NotSatisfied));
+        eq(uint256(reason), uint256(T.Reason.StoppedByIntervener));
+        vm.warp(DEADLINE);
+        market.claimRefund(id);
+        eq(token.balanceOf(BUYER), 100_000);
+        eq(capacity.getPool(pool).consumed, 1);
+        _liftStop(guardian);
+        yes(keccak256(abi.encode(safety.bindingOf(sibling))) == terminalRecord);
+        _sums();
+    }
+
+    function test_ASFRev10TakeoverClearsProviderDocumentButKeepsGuardianGate() public {
+        uint256 id = _book();
+        vm.warp(START);
+        _admit(id);
+        vm.prank(PROVIDER);
+        safety.suspend(leaf, T.RESTRICT_ESSENTIAL_ONLY, keccak256("provider response"), bytes32(0));
+        _pause(leaf, T.RESTRICT_ESSENTIAL_ONLY);
+        T.Binding memory record = safety.bindingOf(leaf);
+        eq(record.suspendedBy, guardian);
+        yes(record.responseRef == bytes32(0));
+        yes(_stop().responseRef == bytes32(0));
+        // A zero document does not erase the guardian's standing stop.
+        vm.prank(PROVIDER);
+        vm.expectPartialRevert(ASFCapacityMarket.SafetyDenied.selector);
+        market.submit(id, keccak256("still stopped"));
+        _liftStop(guardian);
+        // Our declared profile allows essential-only continuation once that stop
+        // is lifted and no response document remains. The record is still Suspended.
+        eq(uint256(safety.bindingOf(leaf).state), uint256(T.BindingState.Suspended));
+        vm.prank(PROVIDER);
+        market.submit(id, keccak256("permitted after lift"));
+        _sums();
+    }
+
+    function test_ASFRev10ExtraSuspenderCannotReplaceGuardianResponseDocument() public {
+        address other = address(0x0A11);
+        address[] memory adapters = new address[](1);
+        adapters[0] = address(market);
+        pool = _pool(adapters);
+        T.BindingInput memory i = _input(pool, bytes32(0), keccak256("document ownership"));
+        i.interveners = new T.Intervener[](2);
+        i.interveners[0] = T.Intervener(guardian, T.RIGHT_ALL);
+        i.interveners[1] = T.Intervener(other, T.RIGHT_SUSPEND);
+        vm.prank(PROVIDER);
+        leaf = safety.adopt(i);
+        vm.prank(PROVIDER);
+        market.configureSafety(pool, leaf);
+        uint256 id = _book();
+        vm.warp(START);
+        _admit(id);
+        bytes32 guardianDoc = keccak256("guardian response");
+        bytes32 otherDoc = keccak256("other response");
+        vm.prank(guardian);
+        safety.suspend(leaf, T.RESTRICT_ESSENTIAL_ONLY, guardianDoc, bytes32(0));
+        vm.prank(other);
+        safety.suspend(leaf, T.RESTRICT_ESSENTIAL_ONLY, otherDoc, bytes32(0));
+        T.Binding memory record = safety.bindingOf(leaf);
+        eq(record.suspendedBy, guardian);
+        yes(record.responseRef == guardianDoc);
+        yes(_stop().responseRef == guardianDoc);
+        T.Stop memory otherStop =
+            safety.stopOf(PROVIDER, ASFKeys.accountSubjectKey(PROVIDER), address(specs), specId, other);
+        yes(otherStop.responseRef == otherDoc);
+        _liftStop(guardian);
+        // Lifting only the named stop leaves its record document uninterpreted,
+        // so the consumer still refuses its optional continuation path.
+        vm.prank(PROVIDER);
+        vm.expectPartialRevert(ASFCapacityMarket.SafetyDenied.selector);
+        market.submit(id, keccak256("unread response"));
+        vm.warp(DEADLINE);
+        market.claimRefund(id);
+        eq(token.balanceOf(BUYER), 100_000);
+        _sums();
+    }
+
     function testDemo_ASFSuspensionKeepsRefundAndExplicitContinuationDistinct() public {
         uint256 cancelId = _book();
         uint256 workId = _book();

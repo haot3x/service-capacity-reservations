@@ -2,11 +2,11 @@
 
 Source: https://github.com/garyyang-finchip/agent-safety-framework
 
-Commit: `71dac3de79f9b0cc98e0fa6484870da4f290fb89` (revision 9)
+Commit: `79ffaa514d4ac492bfb8a85cf5962b61ed68e062` (revision 10)
 
-Contracts: https://github.com/garyyang-finchip/agent-safety-framework/tree/71dac3de79f9b0cc98e0fa6484870da4f290fb89/assets/erc-asf/contracts
+Contracts: https://github.com/garyyang-finchip/agent-safety-framework/tree/79ffaa514d4ac492bfb8a85cf5962b61ed68e062/assets/erc-asf/contracts
 
-Schemas: https://github.com/garyyang-finchip/agent-safety-framework/tree/71dac3de79f9b0cc98e0fa6484870da4f290fb89/assets/erc-asf/schemas
+Schemas: https://github.com/garyyang-finchip/agent-safety-framework/tree/79ffaa514d4ac492bfb8a85cf5962b61ed68e062/assets/erc-asf/schemas
 
 Nine Solidity files, six JSON schemas and `LICENSE.md` are copied byte-for-byte from that commit. The manifest `SHA256SUMS` records all sixteen files. The original dependency is CC0-1.0; the local consumer under `src/asf` and integration tests are MIT, authored by Ted (@haot3x). This README and manifest are local provenance records.
 
