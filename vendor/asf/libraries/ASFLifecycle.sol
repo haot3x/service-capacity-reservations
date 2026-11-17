@@ -141,19 +141,50 @@ library ASFLifecycle {
         external
     {
         T.Binding storage b = existing(s, bindingId);
-        if (b.state != T.BindingState.Active) revert ASFErrors.InvalidState();
         if (restrictions == 0 || restrictions > T.RESTRICT_ALL) revert ASFErrors.InvalidRestriction();
         if (rightsOf(s, bindingId, msg.sender) & T.RIGHT_SUSPEND == 0) revert ASFErrors.NotAuthorized();
-        b.state = T.BindingState.Suspended;
-        b.restrictions = restrictions;
-        b.responseRef = responseRef;
-        b.suspendedBy = msg.sender;
+        if (b.state == T.BindingState.Active) {
+            b.state = T.BindingState.Suspended;
+            b.restrictions = restrictions;
+            b.responseRef = responseRef;
+            b.suspendedBy = msg.sender;
+            b.stateChangedAt = uint64(block.timestamp);
+            // an intervener's suspension is also recorded into its standing stop against the adopter for the
+            // subject and the specification: it is not escaped by holding or creating another binding (Section 8.5)
+            if (msg.sender != b.adopter) recordStop(s, b, bindingId, restrictions, responseRef);
+            emit IASFBindingRegistry.BindingStateChanged(
+                bindingId, T.BindingState.Active, T.BindingState.Suspended, restrictions, responseRef, msg.sender, reasonRef
+            );
+            return;
+        }
+        // An intervener's suspension is never blocked, neither by an existing suspension nor by termination
+        // (Section 8.1). The adopter's own suspension of a record that is not Active stays an invalid transition.
+        if (msg.sender == b.adopter) revert ASFErrors.InvalidState();
+        if (b.state == T.BindingState.Terminated) {
+            // Terminated is terminal and the record does not change; the intervener's stop is recorded through it,
+            // so that terminating a binding before an intervener's suspension lands does not escape the stop
+            recordStop(s, b, bindingId, restrictions, responseRef);
+            emit IASFBindingRegistry.BindingStateChanged(
+                bindingId, T.BindingState.Terminated, T.BindingState.Terminated, b.restrictions, b.responseRef, msg.sender, reasonRef
+            );
+            return;
+        }
+        // Suspended -> Suspended: the record's set widens by union. Its document is always its owner's: a record that
+        // carried the adopter's own suspension becomes the intervener's, with the intervener's document (zero: none
+        // published yet); a record that carries the intervener's own suspension takes a non-zero document it
+        // supplies; a record that carries another intervener's suspension keeps that intervener's document, the
+        // widening intervener's document being the document of its own stop.
+        b.restrictions |= restrictions;
+        if (b.suspendedBy == b.adopter) {
+            b.suspendedBy = msg.sender;
+            b.responseRef = responseRef;
+        } else if (b.suspendedBy == msg.sender && responseRef != bytes32(0)) {
+            b.responseRef = responseRef;
+        }
         b.stateChangedAt = uint64(block.timestamp);
-        // an intervener's suspension is also recorded into its standing stop against the adopter for the subject
-        // and the specification: it is not escaped by holding or creating another binding (Section 8.5)
-        if (msg.sender != b.adopter) recordStop(s, b, bindingId, restrictions, responseRef);
+        recordStop(s, b, bindingId, restrictions, responseRef);
         emit IASFBindingRegistry.BindingStateChanged(
-            bindingId, T.BindingState.Active, T.BindingState.Suspended, restrictions, responseRef, msg.sender, reasonRef
+            bindingId, T.BindingState.Suspended, T.BindingState.Suspended, b.restrictions, b.responseRef, msg.sender, reasonRef
         );
     }
 

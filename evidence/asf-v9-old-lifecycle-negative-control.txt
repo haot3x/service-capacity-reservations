@@ -1,0 +1,22 @@
+Negative control: revision-8 lifecycle at 7bc0141; three InvalidState failures are expected.
+Compiling 3 files with Solc 0.8.26
+Solc 0.8.26 finished in 1.51s
+Compiler run successful!
+
+Ran 3 tests for test/ASFCapacity.t.sol:ASFCapacityTest
+[FAIL: InvalidState()] test_ASFRev9AtomicEscalationClosesContinuationAndResumeRestoresIt() (gas: 2781139)
+[FAIL: InvalidState()] test_ASFRev9EscalationPreservesCancellationAndDeadlineRefund() (gas: 2190660)
+[FAIL: InvalidState()] test_ASFRev9OtherSuspenderCannotPreemptNamedGuardian() (gas: 2394498)
+Suite result: FAILED. 0 passed; 3 failed; 0 skipped; finished in 3.86ms (5.46ms CPU time)
+
+Ran 1 test suite in 4.15ms (3.86ms CPU time): 0 tests passed, 3 failed, 0 skipped (3 total tests)
+
+Failing tests:
+Encountered 3 failing tests in test/ASFCapacity.t.sol:ASFCapacityTest
+[FAIL: InvalidState()] test_ASFRev9AtomicEscalationClosesContinuationAndResumeRestoresIt() (gas: 2781139)
+[FAIL: InvalidState()] test_ASFRev9EscalationPreservesCancellationAndDeadlineRefund() (gas: 2190660)
+[FAIL: InvalidState()] test_ASFRev9OtherSuspenderCannotPreemptNamedGuardian() (gas: 2394498)
+
+Encountered a total of 3 failing tests, 0 tests succeeded
+
+Tip: Run `forge test --rerun` to retry only the 3 failed tests
