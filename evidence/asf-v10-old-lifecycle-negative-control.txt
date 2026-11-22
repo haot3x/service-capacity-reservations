@@ -1,0 +1,21 @@
+Compiling 3 files with Solc 0.8.26
+Solc 0.8.26 finished in 1.60s
+Compiler run successful!
+
+Ran 3 tests for test/ASFCapacity.t.sol:ASFCapacityTest
+[FAIL: expected true] test_ASFRev10ExtraSuspenderCannotReplaceGuardianResponseDocument() (gas: 2539999)
+[FAIL: InvalidState()] test_ASFRev10StopThroughTerminatedSiblingBlocksDeliveryButKeepsRefund() (gas: 1897962)
+[FAIL: expected true] test_ASFRev10TakeoverClearsProviderDocumentButKeepsGuardianGate() (gas: 1552235)
+Suite result: FAILED. 0 passed; 3 failed; 0 skipped; finished in 2.96ms (3.75ms CPU time)
+
+Ran 1 test suite in 3.90ms (2.96ms CPU time): 0 tests passed, 3 failed, 0 skipped (3 total tests)
+
+Failing tests:
+Encountered 3 failing tests in test/ASFCapacity.t.sol:ASFCapacityTest
+[FAIL: expected true] test_ASFRev10ExtraSuspenderCannotReplaceGuardianResponseDocument() (gas: 2539999)
+[FAIL: InvalidState()] test_ASFRev10StopThroughTerminatedSiblingBlocksDeliveryButKeepsRefund() (gas: 1897962)
+[FAIL: expected true] test_ASFRev10TakeoverClearsProviderDocumentButKeepsGuardianGate() (gas: 1552235)
+
+Encountered a total of 3 failing tests, 0 tests succeeded
+
+Tip: Run `forge test --rerun` to retry only the 3 failed tests

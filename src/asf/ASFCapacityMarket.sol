@@ -12,7 +12,7 @@ import {IASFSpecificationRegistry} from "../../vendor/asf/interfaces/IASFSpecifi
 import {CapacitySafetyPolicy as Policy} from "./CapacitySafetyPolicy.sol";
 
 /// @author Ted (@haot3x)
-/// @notice Local consumer of pinned ASF revision 8. Provider suspension covers commitments and delivery;
+/// @notice Local consumer of the ASF dependency pinned in vendor/asf/README.md. Provider suspension covers commitments and delivery;
 ///         established escrow recovery and settlement have a separate, pre-accepted authority.
 contract ASFCapacityMarket is DirectBookingMarket {
     IASFBindingRegistry public immutable safetyRegistry;
